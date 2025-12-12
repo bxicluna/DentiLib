@@ -11,7 +11,7 @@ dbConnection()
 
 
 app.use(express.json())
-app.use('/api/auth', userRoutes)
+app.use('/api/', userRoutes)
 
 
 app.get('/', (req, res) => {
