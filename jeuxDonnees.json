@@ -1,0 +1,46 @@
+[
+    {
+        "emailCreation": "blandine@gmail.com",
+        "firstName": "Blandine",
+        "lastName": "Xicluna",
+        "passwordCreation": "Admin123",
+        "emailLogin": "blandine@gmail.com",
+        "passwordLogin": "Admin123"
+    },
+
+    {
+        "emailCreation": "",
+        "firstName": "Blandine",
+        "lastName": "Xicluna",
+        "passwordCreation": "Admin123",
+        "emailLogin": "blandine@gmail.com",
+        "passwordLogin": "Admin123"
+    },
+
+    {
+        "emailCreation": "blandine@gmail.com",
+        "firstName": "Blandine",
+        "lastName": "Xicluna",
+        "passwordCreation": "123",
+        "emailLogin": "blandine@gmail.com",
+        "passwordLogin": "123"
+    },
+
+    {
+        "emailCreation": "blandine@gmail.com",
+        "firstName": "Blandine",
+        "lastName": "Xicluna",
+        "passwordCreation": "Admin123",
+        "emailLogin": "blandine@gmail.com",
+        "passwordLogin": "Admin"
+    },
+
+    {
+        "emailCreation": "blandine@gmail.com",
+        "firstName": "Blandine",
+        "lastName": "Xicluna",
+        "passwordCreation": "",
+        "emailLogin": "blandine@gmail.com",
+        "passwordLogin": "Admin123"
+    }
+]
