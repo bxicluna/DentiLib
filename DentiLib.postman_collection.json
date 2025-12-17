@@ -1,0 +1,294 @@
+{
+	"info": {
+		"_postman_id": "a97fd801-bbb9-404b-b837-a0127735e363",
+		"name": "DentiLib",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47035611",
+		"_collection_link": "https://mission-cosmonaut-98152459-798561.postman.co/workspace/Xicluna-Blandine's-Workspace~6a9d00c8-0fea-4453-8674-8d9e8d2fcc9c/collection/47035611-a97fd801-bbb9-404b-b837-a0127735e363?action=share&source=collection_link&creator=47035611"
+	},
+	"item": [
+		{
+			"name": "create admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"const statusCode = pm.response.code\r",
+							"\r",
+							"const reponse = pm.response.json()\r",
+							"pm.test(\"The response must be JSON\", function () {\r",
+							"    pm.response.to.be.json\r",
+							"})\r",
+							"\r",
+							"if (statusCode == 409) {\r",
+							"    pm.test((\"Il y a un message d'erreur dans la réponse\"), () => {\r",
+							"        pm.expect(reponse.message).to.eql(\"Email déjà utilisé\")\r",
+							"    })\r",
+							"}\r",
+							"\r",
+							"if (statusCode == 201) {\r",
+							"    pm.test((\"Check if body have properties Message and admin\"), () => {\r",
+							"        pm.expect(reponse).to.have.property(\"message\");\r",
+							"        pm.expect(reponse).to.have.property(\"admin\");\r",
+							"    })\r",
+							"    pm.test((\"Le message indique que l'utilisateur est créé\"), () => {\r",
+							"        pm.expect(reponse.message).to.eql(\"Utilisateur créé\")\r",
+							"    })\r",
+							"}\r",
+							"\r",
+							"if (statusCode == 400) {\r",
+							"    if (pm.iterationData.get(\"emailCreation\") == \"\") {\r",
+							"        pm.test(\"Tous les champs sont requis\", function () {\r",
+							"            pm.expect(reponse.message).to.eql(\"Merci de remplir tous les champs\")\r",
+							"        })\r",
+							"    }\r",
+							"\r",
+							"    if (pm.iterationData.get(\"passwordCreation\") == \"\") {\r",
+							"        pm.test(\"Tous les champs sont requis\", function () {\r",
+							"            pm.expect(reponse.message).to.eql(\"Merci de remplir tous les champs\")\r",
+							"        })\r",
+							"    } else if (pm.iterationData.get(\"passwordCreation\").length < 6) {\r",
+							"        pm.test(\"Le mot de passe doit être au moins de 6 caractères\", function () {\r",
+							"            pm.expect(reponse.message).to.eql(\"Le mot de passe doit contenir au moins 6 caractères\")\r",
+							"        })\r",
+							"    }\r",
+							"\r",
+							"    \r",
+							"\r",
+							"}\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"{{firstName}}\",\r\n    \"lastName\": \"{{lastName}}\",\r\n    \"email\": \"{{emailCreation}}\",\r\n    \"password\": \"{{passwordCreation}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/user/registerAdmin",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"registerAdmin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set (\"tokenAdmin\", pm.response.json().token)\r",
+							"\r",
+							"const statusCode = pm.response.code\r",
+							"const reponse = pm.response.json()\r",
+							"\r",
+							"if(statusCode == 401){\r",
+							"    pm.test((\"Le mot de passe est incorrect\"), () => {\r",
+							"        pm.expect(reponse.message).to.eql(\"Mot de passe incorrect\")\r",
+							"    })\r",
+							"}\r",
+							"\r",
+							"if (statusCode == 404) {\r",
+							"    pm.test((\"L'utilisateur n'existe pas\"), () => {\r",
+							"        pm.expect(reponse.message).to.eql(\"L'utilisateur n'existe pas\")\r",
+							"    })\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"{{emailLogin}}\",\r\n    \"password\": \"{{passwordLogin}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/user/login",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create user (prothesiste)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"lastName\": \"Espenel\",\r\n    \"firstName\": \"Louise\",\r\n    \"email\": \"espenellouise@gmail.com\",\r\n    \"role\": \"prothesiste\",\r\n    \"password\": \"Admin123\",\r\n    \"siret\": \"12345678900013\",\r\n    \"associatedUser\": \"693c43f85c97140eceb57bf7\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/user/registerUser",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"registerUser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete user",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Blandine\",\r\n    \"lastName\": \"Xicluna\",\r\n    \"email\": \"blandine@gmail.com\",\r\n    \"role\": \"admin\",\r\n    \"password\": \"Admin123\"\r\n}"
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/user/deleteUser/:userId",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"deleteUser",
+						":userId"
+					],
+					"variable": [
+						{
+							"key": "userId",
+							"value": "69412ab1288f9effe65db3dd"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete my account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Blandine\",\r\n    \"lastName\": \"Xicluna\",\r\n    \"email\": \"blandine@gmail.com\",\r\n    \"role\": \"admin\",\r\n    \"password\": \"Admin123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/user/deleteMyAccount",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"deleteMyAccount"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
