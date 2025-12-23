@@ -7,7 +7,7 @@ const workSheetSchema = new mongoose.Schema(
             required: true,           
         },
         comment: {
-            type: Text
+            type: String
         },
         status: {
             type: String,

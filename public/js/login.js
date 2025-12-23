@@ -49,18 +49,21 @@ form.addEventListener('submit', async (event) => {
 
             console.log(responseData.role);
             if(responseData.token){
-                localStorage.set('token', responseData.token)
+                localStorage.setItem('token', responseData.token)
             }
             
 
             switch(responseData.role){
                 case 'admin':
+                    localStorage.setItem('role', responseData.role)
                     window.location.href = "/admin.html"
                     break;
                 case 'dentiste':
+                    localStorage.setItem('role', responseData.role)
                     window.location.href = "/dentiste.html"
                     break;
                 case 'prothesiste':
+                    localStorage.setItem('role', responseData.role)
                     window.location.href = "/prothesiste.html"
                     break;
                 default:

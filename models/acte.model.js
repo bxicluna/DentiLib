@@ -5,13 +5,14 @@ const acteSchema = new mongoose.Schema(
         acteName: {
             type: String,
             trim: true,
-            required: true
+            required: true,
+            unique: true
         },
         acteDescription: {
-            type: Text,
+            type: String,
         }
     }
 )
 
-module.exports = mongoose.model('Acte', actesSchema)
+module.exports = mongoose.model('Acte', acteSchema)
 

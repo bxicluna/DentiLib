@@ -1,11 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>admin page</h1>
-</body>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin - DentiLib</title>
+    <link rel="stylesheet" href="styles/admin.css" />
+  </head>
+  <body>
+    <!-- MODAL AJOUT UTILISATEUR -->
+    <div class="modal" id="addUserModal">
+      <div class="modal-content">
+        <span class="close-modal" id="closeAddUserModal">&times;</span>
+
+        <h2>Ajouter un utilisateur</h2>
+
+        <form id="addUserForm">
+          <div class="form-group">
+            <label for="firstName">Prénom</label>
+            <input type="text" id="firstName" name="firstName" required />
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Nom</label>
+            <input type="text" id="lastName" name="lastName" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+
+          <div class="form-group">
+            <label for="role">Rôle</label>
+            <select id="role" name="role" required>
+              <option value="">Sélectionner un rôle</option>
+              <option value="admin">Admin</option>
+              <option value="dentiste">Dentiste</option>
+              <option value="prothesiste">Prothésiste</option>
+            </select>
+          </div>
+
+          <div class="form-group hidden" id="siretContainer">
+            <label for="siret">SIRET</label>
+            <input type="text" id="siret" name="siret" />
+          </div>
+
+          <!-- Tableau des dentistes (caché par défaut) -->
+          <div id="dentisteContainer" class="hidden">
+            <h3>Lier à un dentiste</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              <tbody id="dentisteTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn">Créer l’utilisateur</button>
+            <button type="button" class="btn btn-logout" id="cancelAddUser">
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL MODIFICATION UTILISATEUR -->
+    <div class="modal" id="editUserModal">
+      <div class="modal-content">
+        <span class="close-modal" id="closeEditUserModal">&times;</span>
+
+        <h2>Modifier un utilisateur</h2>
+
+        <form id="editUserForm">
+          <div class="form-group">
+            <label for="editFirstName">Prénom</label>
+            <input type="text" id="editFirstName" name="firstName" required />
+          </div>
+
+          <div class="form-group">
+            <label for="editLastName">Nom</label>
+            <input type="text" id="editLastName" name="lastName" required />
+          </div>
+
+          <div class="form-group">
+            <label for="editEmail">Email</label>
+            <input type="email" id="editEmail" name="email" required />
+          </div>
+
+          <div class="form-group" id="editSiretContainer">
+            <label for="editSiret">SIRET</label>
+            <input type="text" id="editSiret" name="siret" />
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn">Modifier</button>
+            <button type="button" class="btn btn-logout" id="cancelEditUser">
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <header class="admin-header">
+      <div class="admin-name">Nom Admin</div>
+
+      <div class="header-actions">
+        <button class="btn" id="openAddUserModal">Ajouter un user</button>
+        <button class="btn" id="openActList">Liste des actes</button>
+        <button class="btn btn-logout" id="logout">Se déconnecter</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="admin-container">
+        <div class="filters">
+          <select id="type-filter">
+            <option>Tous</option>
+            <option>Dentiste</option>
+            <option>Prothesiste</option>
+          </select>
+
+          <input id="recherche-text" type="text" placeholder="Rechercher dentiste" />
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nom / Prénom</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Associé</th>
+            </tr>
+          </thead>
+          <tbody id="mainUserTableBody"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer>© 2025 DentiLib</footer>
+    <script src="/js/admin.js"></script>
+  </body>
 </html>
