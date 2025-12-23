@@ -6,6 +6,8 @@ const path = require('path')
 const dbConnection = require("./config/dbConfig")
 require('./models/user.model.js')
 const userRoutes = require('./routes/userRoutes')
+const adminRoutes = require('./routes/adminRoutes')
+
 
 app.use(express.json())
 
@@ -15,6 +17,7 @@ dbConnection()
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api/', userRoutes)
+app.use('/api/', adminRoutes)
 
 
 app.get('/', (req, res) => {
