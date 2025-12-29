@@ -64,7 +64,7 @@ form.addEventListener('submit', async (event) => {
                     break;
                 case 'prothesiste':
                     localStorage.setItem('role', responseData.role)
-                    window.location.href = "/prothesiste.html"
+                    window.location.href = "/actesProthesistes.html"
                     break;
                 default:
                     console.log('Role inconnu')

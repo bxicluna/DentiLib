@@ -7,6 +7,8 @@ const dbConnection = require("./config/dbConfig")
 require('./models/user.model.js')
 const userRoutes = require('./routes/userRoutes')
 const adminRoutes = require('./routes/adminRoutes')
+const worksheetRoutes = require('./routes/worksheetRoutes')
+const actesRoutes = require('./routes/actesRoutes')
 
 
 app.use(express.json())
@@ -18,6 +20,8 @@ dbConnection()
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api/', userRoutes)
 app.use('/api/', adminRoutes)
+app.use('/api/', worksheetRoutes)
+app.use('/api/acte', actesRoutes)
 
 
 app.get('/', (req, res) => {

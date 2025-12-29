@@ -1,0 +1,130 @@
+/* Titre principal dentiste */
+#dentisteContainer h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+/* Bouton création fiche */
+#btnOpenCreate {
+    font-weight: 600;
+}
+
+/* ===== TABLE DENTISTE ===== */
+#dentisteContainer table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#dentisteContainer table tbody tr:hover {
+    background-color: #1e293b;
+}
+
+/* Ligne sélectionnée */
+#dentisteTableBody tr.selected {
+    background-color: #0284c7;
+    color: white;
+}
+
+/* Alignement colonne actions */
+#dentisteContainer td:last-child {
+    text-align: center;
+}
+
+/* ===== STATUS SPECIFIQUES ===== */
+.status-en-cours {
+    background-color: #075985;
+    color: #bae6fd;
+}
+
+.status-termine {
+    background-color: #166534;
+    color: #bbf7d0;
+}
+
+.status-livre {
+    background-color: #374151;
+    color: #e5e7eb;
+}
+
+/* ===== MODAL DENTISTE ===== */
+#createModal .modal-content {
+    max-width: 600px;
+}
+
+/* Champs patient côte à côte */
+.patient-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.patient-row .form-group {
+    flex: 1;
+}
+
+/* ===== FORM ACTES ===== */
+.acte-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+}
+
+/* Total fiche */
+.fiche-total {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background-color: #020617;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    text-align: right;
+    font-weight: bold;
+    color: #38bdf8;
+}
+
+/* ===== BADGE PAIEMENT ===== */
+.badge-payee {
+    background-color: #14532d;
+    color: #bbf7d0;
+}
+
+.badge-non-payee {
+    background-color: #7f1d1d;
+    color: #fecaca;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+
+    .filters {
+        flex-direction: column;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    table thead {
+        display: none;
+    }
+
+    table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 0.5rem;
+    }
+
+    table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+    }
+
+    table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #9ca3af;
+    }
+}

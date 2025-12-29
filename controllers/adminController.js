@@ -228,17 +228,17 @@ exports.createActe = async (req, res) => {
     const { acteName, acteDescription } = req.body;
 
     if (!acteName) {
-      res.status(400).json({ message: "Le nom de l'acte est requis" });
+      return res.status(400).json({ message: "Le nom de l'acte est requis" });
     }
 
-    const existing = await Acte.find({ acteName });
+    const existing = await Acte.findOne({ acteName });
 
     if (existing) {
-      res.status(409).json({ message: "Cet acte existe déjà" });
+      return res.status(409).json({ message: "Cet acte existe déjà" });
     }
 
-    const acte = Acte.create({ acteName, acteDescription });
-    res.status(201).json({
+    const acte = await Acte.create({ acteName, acteDescription });
+    return res.status(201).json({
       message: "Acte créé",
       acte,
     });

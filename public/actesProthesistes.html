@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Catalogue des actes</title>
+
+    <!-- CSS existant -->
+    <link rel="stylesheet" href="./styles/admin.css" />
+    <!-- CSS spécifique prothésiste -->
+    <link rel="stylesheet" href="./styles/prothesiste.css" />
+  </head>
+
+  <body>
+    <!-- HEADER -->
+    <header class="admin-header">
+      <div class="admin-name">Espace Prothésiste</div>
+      <div class="header-actions">
+        <button class="btn">Mon profil</button>
+        <button class="btn btn-logout">Déconnexion</button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+      <div class="admin-container">
+        <h2 class="page-title">Catalogue des actes</h2>
+
+        <!-- AJOUT ACTE -->
+        <div class="add-acte-card">
+          <h3>Ajouter un acte à mon catalogue</h3>
+
+          <div class="form-inline">
+            <select id="acteSelect">
+              <option value="">-- Choisir un acte --</option>
+            </select>
+
+            <input type="number" placeholder="Prix (€)" id="actePrice" />
+
+            <button id="addActeBtn" class="btn btn-primary">Ajouter</button>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <table class="catalog-table">
+          <thead>
+            <tr>
+              <th>Acte</th>
+              <th>Prix (€)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="catalogTableBody">
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>© 2025 – DentiLib</footer>
+    <script src="/js/acteProthesiste.js"></script>
+  </body>
+</html>

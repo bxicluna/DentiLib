@@ -1,11 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>dentiste page</h1>
-</body>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Espace Dentiste</title>
+    <link rel="stylesheet" href="./styles/admin.css" />
+    <link rel="stylesheet" href="./styles/dentiste.css" />
+  </head>
+  <body>
+    <!-- ===== HEADER ===== -->
+    <header class="admin-header">
+      <div class="admin-name">👩‍⚕️ Dr. Dupont (Dentiste)</div>
+      <div class="header-actions">
+        <button class="btn">Mon profil</button>
+        <button class="btn btn-logout">Déconnexion</button>
+      </div>
+    </header>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+      <div class="admin-container" id="dentisteContainer">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+          "
+        >
+          <h2 style="color: #38bdf8">Mes fiches de travaux</h2>
+          <button class="btn btn-detail" id="btnOpenCreate">
+            + Nouvelle fiche
+          </button>
+        </div>
+
+        <!-- ===== FILTERS ===== -->
+        <div class="filters">
+          <input type="text" placeholder="Patient (nom / prénom)" />
+          <select>
+            <option value="">Tous les statuts</option>
+            <option value="en_cours">En cours</option>
+            <option value="termine">Terminé</option>
+            <option value="livre">Livré</option>
+          </select>
+          <input type="date" />
+        </div>
+
+        <!-- ===== TABLE ===== -->
+        <table>
+          <thead>
+            <tr>
+              <th>N° Fiche</th>
+              <th>Patient</th>
+              <th>Date</th>
+              <th>Prothésiste</th>
+              <th>Statut</th>
+              <th>Total (€)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="dentisteTableBody">
+            <tr>
+              <td>FT-001</td>
+              <td>Martin Paul</td>
+              <td>12/09/2025</td>
+              <td>Lab Dental Pro</td>
+              <td>
+                <span class="status-badge status-active">En cours</span>
+              </td>
+              <td>320 €</td>
+              <td>
+                <button class="btn btn-detail">Détail</button>
+              </td>
+            </tr>
+            <tr>
+              <td>FT-002</td>
+              <td>Durand Claire</td>
+              <td>10/09/2025</td>
+              <td>Smile Lab</td>
+              <td>
+                <span class="status-badge status-inactive">Livré</span>
+              </td>
+              <td>450 €</td>
+              <td>
+                <button class="btn btn-detail">Détail</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- ===== MODAL CREATION FICHE ===== -->
+    <div class="modal" id="createModal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Créer une fiche de travaux</h2>
+
+        <div class="form-group">
+          <label>Nom du patient</label>
+          <input type="text" />
+        </div>
+
+        <div class="form-group">
+          <label>Prénom du patient</label>
+          <input type="text" />
+        </div>
+
+        <div class="form-group">
+          <label>Prothésiste</label>
+          <select>
+            <option>Lab Dental Pro</option>
+            <option>Smile Lab</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Acte</label>
+          <select>
+            <option>Couronne céramique</option>
+            <option>Bridge</option>
+            <option>Appareil orthodontique</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Quantité</label>
+          <input type="number" value="1" />
+        </div>
+
+        <div class="form-actions">
+          <button class="btn">Annuler</button>
+          <button class="btn btn-detail">Créer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>© 2025 – Application Fiches Dentaires</footer>
+  </body>
 </html>

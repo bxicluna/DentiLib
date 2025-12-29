@@ -1,0 +1,86 @@
+.page-title {
+  margin-bottom: 1.5rem;
+  color: #38bdf8;
+  text-align: center;
+}
+
+/* ===== AJOUT ACTE ===== */
+.add-acte-card {
+  background-color: #020617;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.add-acte-card h3 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #e5e7eb;
+}
+
+.form-inline {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-inline select,
+.form-inline input {
+  padding: 0.6rem 0.8rem;
+  background-color: #020617;
+  border: 1px solid #334155;
+  color: #e5e7eb;
+  border-radius: 6px;
+}
+
+.form-inline select:focus,
+.form-inline input:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+/* ===== TABLE ===== */
+.catalog-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.catalog-table thead {
+  background-color: #020617;
+}
+
+.catalog-table th,
+.catalog-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #334155;
+}
+
+.catalog-table tbody tr:hover {
+  background-color: #1e293b;
+}
+
+/* ===== PRICE INPUT ===== */
+.price-input {
+  width: 90px;
+  padding: 0.4rem;
+  background-color: #020617;
+  border: 1px solid #334155;
+  color: #e5e7eb;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.price-input:focus {
+  border-color: #38bdf8;
+  outline: none;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.btn-edit {
+  color: #38bdf8;
+}
+
+.btn-delete {
+  color: #f87171;
+}
