@@ -1,5 +1,6 @@
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
+const logoutButton = document.getElementById("logout");
 const acteSelect = document.getElementById("acteSelect");
 const addBtn = document.getElementById("addActeBtn");
 const priceInput = document.getElementById("actePrice");
@@ -154,6 +155,11 @@ tableBody.addEventListener("click", async (e) => {
   });
 
   loadProthesistActes(); // refresh
+});
+
+logoutButton.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
 });
 
 document.addEventListener("DOMContentLoaded", () => {
