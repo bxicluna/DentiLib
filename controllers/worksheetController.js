@@ -5,6 +5,7 @@ const WorkSheet = require("../models/worksheet.model.js");
 const Counter = require("../models/counter.model.js");
 require("dotenv").config();
 const mongoose = require("mongoose");
+const { json } = require("express");
 
 exports.createWorksheet = async (req, res) => {
   try {
@@ -251,3 +252,29 @@ exports.updateWorksheet = async (req, res) => {
 };
 
 exports.getWorksheetStatus = async (req, res) => {};
+
+exports.updateStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
+
+    if(status !== "En attente" && status !== "En cours" && status !== "Termine") {
+      return res.status(400).json({ message: "status invalide"})
+    }
+
+    // Vérifie que c'est bien le prothésiste assigné
+    const ws = await WorkSheet.findById(id);
+    if (!ws) return res.status(404).json({ message: "Fiche introuvable" });
+
+    if (req.user.role !== "prothesiste" || ws.prothesisteId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Accès refusé" });
+    }
+
+    ws.status = status;
+    await ws.save();
+
+    res.status(200).json({ message: "Statut mis à jour", status });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur serveur", error: err });
+  }
+};

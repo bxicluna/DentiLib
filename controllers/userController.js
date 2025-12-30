@@ -77,7 +77,12 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role, firstName: user.firstName, lastName: user.lastName },
+      {
+        id: user.id,
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
@@ -148,13 +153,18 @@ exports.deleteMyAccount = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).populate({
-      path: "associatedUser", // le prothésiste
-      populate: {
-        path: "actesList.acte", // chaque acte
+    const user = await User.findById(req.params.userId)
+      .populate({
+        path: "associatedUser",
+        populate: {
+          path: "actesList.acte",
+          model: "Acte",
+        },
+      })
+      .populate({
+        path: "actesList.acte",
         model: "Acte",
-      },
-    });
+      });
     if (!user) {
       return res.status(404).json({ message: "Utilisateur introuvable" });
     }

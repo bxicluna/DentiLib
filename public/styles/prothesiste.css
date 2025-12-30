@@ -60,6 +60,22 @@
   background-color: #1e293b;
 }
 
+/* ===== STATUS SPECIFIQUES ===== */
+.status-en-cours {
+  background-color: #075985;
+  color: #bae6fd;
+}
+
+.status-termine {
+  background-color: #166534;
+  color: #bbf7d0;
+}
+
+.status-en-attente {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
 /* ===== PRICE INPUT ===== */
 .price-input {
   width: 90px;

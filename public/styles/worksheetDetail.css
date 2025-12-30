@@ -157,6 +157,11 @@
 
 .acte-row input,
 .acte-row select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #020617;
+  color: #e5e7eb;
   width: 100%;
   box-sizing: border-box;
 }

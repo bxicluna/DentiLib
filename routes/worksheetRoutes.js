@@ -8,5 +8,6 @@ router.get('/getWorksheetByUser', authMiddleware, worksheetController.getWorkshe
 router.get('/getWorksheetById/:id', authMiddleware, worksheetController.getWorksheetById)
 router.delete('/deleteWorksheet/:id', authMiddleware, worksheetController.deleteWorksheet)
 router.put('/updateWorksheet/:id', authMiddleware, worksheetController.updateWorksheet)
+router.put('/updateStatus/:id', authMiddleware, worksheetController.updateStatus)
 
 module.exports = router

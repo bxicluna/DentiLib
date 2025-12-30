@@ -39,22 +39,37 @@
           <div class="form-row">
             <div class="form-group">
               <label>Prénom du patient</label>
-              <input type="text" id="patientFirstName" class="editable" readonly/>
+              <input
+                type="text"
+                id="patientFirstName"
+                class="editable"
+                readonly
+              />
             </div>
             <div class="form-group">
               <label>Nom du patient</label>
-              <input type="text" id="patientLastName" class="editable" readonly/>
+              <input
+                type="text"
+                id="patientLastName"
+                class="editable"
+                readonly
+              />
             </div>
             <div class="form-group">
               <label>Numéro de sécurité sociale</label>
-              <input type="text" id="patientNumSecu" class="editable" readonly/>
+              <input
+                type="text"
+                id="patientNumSecu"
+                class="editable"
+                readonly
+              />
             </div>
           </div>
 
           <!-- Email -->
           <div class="form-group">
             <label>Email du patient</label>
-            <input type="email" id="patientEmail" class="editable" readonly/>
+            <input type="email" id="patientEmail" class="editable" readonly />
           </div>
 
           <!-- Prothésiste -->
@@ -76,13 +91,23 @@
         <!-- ===== COMMENTAIRE ===== -->
         <div class="form-group" style="margin-top: 1.5rem">
           <label>Commentaire</label>
-          <textarea id="comment" rows="2"b class="editable" readonly></textarea>
+          <textarea
+            id="comment"
+            rows="2"
+            b
+            class="editable"
+            readonly
+          ></textarea>
         </div>
 
         <!-- ===== TOTAL ET STATUT ===== -->
         <div class="bottom-row">
           <div class="status-container">
-            <span id="statusBadge" class="badge completed"></span>
+            <select id="statusSelect">
+              <option value="En attente">En attente</option>
+              <option value="En cours">En cours</option>
+              <option value="Termine">Terminé</option>
+            </select>
           </div>
           <div class="fiche-total">
             Total : <span id="totalAmount">0</span> €
