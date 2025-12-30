@@ -1,0 +1,261 @@
+/* ===== CONTAINER PRINCIPAL ===== */
+.worksheet-detail {
+  background-color: #020617;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* ===== TITRE ===== */
+.worksheet-detail h2 {
+  color: #38bdf8;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* ===== FORM-GROUP ===== */
+.worksheet-detail .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.worksheet-detail .form-group label {
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #d1d5db;
+}
+
+.worksheet-detail .form-group input,
+.worksheet-detail .form-group textarea {
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  background-color: #020617;
+  border: 1px solid #334155;
+  color: #e5e7eb;
+}
+
+.worksheet-detail .form-group input:focus,
+.worksheet-detail .form-group textarea:focus {
+  border-color: #38bdf8;
+  outline: none;
+}
+
+/* ===== LIGNES FLEX ===== */
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* ===== BADGE STATUT ===== */
+/*.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  font-weight: bold;
+  color: white;
+  align-self: flex-end;
+}
+
+.badge.completed {
+  background-color: green;
+}
+.badge.pending {
+  background-color: orange;
+}
+.badge.cancelled {
+  background-color: red;
+}*/
+
+/* Conteneur flex pour total et statut */
+.bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+/* Badge statut */
+.status-container .badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: bold;
+  color: white;
+}
+
+.status-en-cours {
+  background-color: #075985;
+  color: #bae6fd;
+}
+
+.status-termine {
+  background-color: #166534;
+  color: #bbf7d0;
+}
+
+.status-en-attente {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+/*.badge.completed {
+  background-color: green;
+}
+.badge.pending {
+  background-color: orange;
+}
+.badge.cancelled {
+  background-color: red;
+}*/
+
+/* Total reste à droite */
+.fiche-total {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #38bdf8;
+}
+
+/* ===== ACTES ===== */
+.worksheet-actes {
+  margin-top: 1.5rem;
+}
+
+.worksheet-actes h3 {
+  color: #38bdf8;
+  margin-bottom: 1rem;
+}
+
+.acte-row {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 40px;
+  gap: 10px;
+  width: 100%;
+}
+
+.acte-row input {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #020617;
+  color: #e5e7eb;
+}
+
+.acte-row.no-delete {
+  grid-template-columns: 3fr 1fr 1fr;
+}
+
+.acte-row input,
+.acte-row select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #020617;
+  color: #e5e7eb;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.acte-name {
+  flex: 3;
+}
+.acte-quantite {
+  flex: 1;
+}
+.acte-prix {
+  flex: 1;
+}
+
+/* ===== BOUTONS SUPPRIMER ACTE ===== */
+.btn-delete-acte {
+  background-color: #7f1d1d;
+  color: #fecaca;
+  border: none;
+  border-radius: 6px;
+  padding: 0 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.btn-delete-acte {
+  width: 100%;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-delete-acte:hover {
+  background-color: #991b1b;
+}
+
+/* ===== TOTAL ===== */
+.fiche-total {
+  margin-top: 1rem;
+  font-weight: bold;
+  font-size: 1rem;
+  text-align: right;
+  color: #38bdf8;
+}
+
+/* ===== BOUTONS ACTIONS ===== */
+.worksheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.btn-edit {
+  background-color: #0284c7;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-edit:hover {
+  background-color: #0369a1;
+}
+
+.btn-delete {
+  background-color: #7f1d1d;
+  color: #fecaca;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background-color: #991b1b;
+}
+
+/* ===== TABLEAU ACTES ===== */
+.worksheet-actes table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.worksheet-actes th,
+.worksheet-actes td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #334155;
+  color: #e5e7eb;
+}
+
+.worksheet-actes tbody tr:hover {
+  background-color: #1e293b;
+}

@@ -20,7 +20,7 @@ dbConnection()
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api/', userRoutes)
 app.use('/api/', adminRoutes)
-app.use('/api/', worksheetRoutes)
+app.use('/api/worksheet/', worksheetRoutes)
 app.use('/api/acte', actesRoutes)
 
 

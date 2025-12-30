@@ -16,7 +16,9 @@ exports.registerAdmin = async (req, res) => {
     const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
 
     if (!email.match(regex)) {
-      return res.status(400).json({ message: "Le format de l'email est invalide" });
+      return res
+        .status(400)
+        .json({ message: "Le format de l'email est invalide" });
     }
 
     const existing = await User.findOne({ email });
@@ -26,11 +28,9 @@ exports.registerAdmin = async (req, res) => {
     }
 
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({
-          message: "Le mot de passe doit contenir au moins 6 caractères",
-        });
+      return res.status(400).json({
+        message: "Le mot de passe doit contenir au moins 6 caractères",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -77,7 +77,12 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      {
+        id: user.id,
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
@@ -104,8 +109,7 @@ exports.deleteUser = async (req, res) => {
     }
 
     await User.findByIdAndDelete(userId);
-    res.status(200).json({ message: "Utilisateur supprimé avec succès"});
-
+    res.status(200).json({ message: "Utilisateur supprimé avec succès" });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -126,13 +130,13 @@ exports.deleteMyAccount = async (req, res) => {
     }
 
     //3️⃣ Vérifier si l'admin existe
-        const user = await User.findById(userIdToDelete);
- 
-        if (!user) {
-            return res.status(404).json({
-                message: "Admin inexistant"
-            });
-        }
+    const user = await User.findById(userIdToDelete);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Admin inexistant",
+      });
+    }
 
     await User.findByIdAndDelete(userIdToDelete);
 
@@ -144,5 +148,29 @@ exports.deleteMyAccount = async (req, res) => {
     return res.status(500).json({
       message: "Internal server error.",
     });
+  }
+};
+
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId)
+      .populate({
+        path: "associatedUser",
+        populate: {
+          path: "actesList.acte",
+          model: "Acte",
+        },
+      })
+      .populate({
+        path: "actesList.acte",
+        model: "Acte",
+      });
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur introuvable" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
