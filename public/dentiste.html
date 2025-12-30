@@ -9,10 +9,9 @@
   <body>
     <!-- ===== HEADER ===== -->
     <header class="admin-header">
-      <div class="admin-name">👩‍⚕️ Dr. Dupont (Dentiste)</div>
+      <div class="admin-name" id="dentistName">👩‍⚕️</div>
       <div class="header-actions">
-        <button class="btn">Mon profil</button>
-        <button class="btn btn-logout">Déconnexion</button>
+        <button class="btn btn-logout" id="logout">Déconnexion</button>
       </div>
     </header>
 
@@ -37,104 +36,151 @@
           <input type="text" placeholder="Patient (nom / prénom)" />
           <select>
             <option value="">Tous les statuts</option>
-            <option value="en_cours">En cours</option>
+            <option value="en attente">En attente</option>
+            <option value="en cours">En cours</option>
             <option value="termine">Terminé</option>
-            <option value="livre">Livré</option>
           </select>
           <input type="date" />
         </div>
 
         <!-- ===== TABLE ===== -->
-        <table>
-          <thead>
-            <tr>
-              <th>N° Fiche</th>
-              <th>Patient</th>
-              <th>Date</th>
-              <th>Prothésiste</th>
-              <th>Statut</th>
-              <th>Total (€)</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="dentisteTableBody">
-            <tr>
-              <td>FT-001</td>
-              <td>Martin Paul</td>
-              <td>12/09/2025</td>
-              <td>Lab Dental Pro</td>
-              <td>
-                <span class="status-badge status-active">En cours</span>
-              </td>
-              <td>320 €</td>
-              <td>
-                <button class="btn btn-detail">Détail</button>
-              </td>
-            </tr>
-            <tr>
-              <td>FT-002</td>
-              <td>Durand Claire</td>
-              <td>10/09/2025</td>
-              <td>Smile Lab</td>
-              <td>
-                <span class="status-badge status-inactive">Livré</span>
-              </td>
-              <td>450 €</td>
-              <td>
-                <button class="btn btn-detail">Détail</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="dentiste-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>N° Fiche</th>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Prothésiste</th>
+                <th>Statut</th>
+                <th>Total (€)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="dentisteTableBody">
+              <tr>
+                <td>FT-001</td>
+                <td>Martin Paul</td>
+                <td>12/09/2025</td>
+                <td>Lab Dental Pro</td>
+                <td>
+                  <span class="status-badge status-active">En cours</span>
+                </td>
+                <td>320 €</td>
+                <td>
+                  <button class="btn btn-detail">Détail</button>
+                </td>
+              </tr>
+              <tr>
+                <td>FT-002</td>
+                <td>Durand Claire</td>
+                <td>10/09/2025</td>
+                <td>Smile Lab</td>
+                <td>
+                  <span class="status-badge status-inactive">Livré</span>
+                </td>
+                <td>450 €</td>
+                <td>
+                  <button class="btn btn-detail">Détail</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
 
     <!-- ===== MODAL CREATION FICHE ===== -->
     <div class="modal" id="createModal">
       <div class="modal-content">
-        <span class="close-modal">&times;</span>
+        <span class="close-modal" id="closeAddWorksheetModal">&times;</span>
         <h2>Créer une fiche de travaux</h2>
 
-        <div class="form-group">
-          <label>Nom du patient</label>
-          <input type="text" />
-        </div>
+        <form id="createWorksheetForm">
+          <!-- Infos patient -->
+          <div class="patient-row">
+            <div class="form-group">
+              <label>Prénom du patient</label>
+              <input
+                type="text"
+                id="patientFirstName"
+                name="patientFirstName"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label>Nom du patient</label>
+              <input
+                type="text"
+                id="patientLastName"
+                name="patientLastName"
+                required
+              />
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label>Prénom du patient</label>
-          <input type="text" />
-        </div>
+          <div class="form-group">
+            <label>Email du patient</label>
+            <input
+              type="email"
+              id="patientEmail"
+              name="patientEmail"
+              required
+            />
+          </div>
 
-        <div class="form-group">
-          <label>Prothésiste</label>
-          <select>
-            <option>Lab Dental Pro</option>
-            <option>Smile Lab</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label>Numéro de sécurité sociale</label>
+            <input
+              type="number"
+              id="patientNumSecu"
+              name="patientNumSecu"
+              required
+            />
+          </div>
 
-        <div class="form-group">
-          <label>Acte</label>
-          <select>
-            <option>Couronne céramique</option>
-            <option>Bridge</option>
-            <option>Appareil orthodontique</option>
-          </select>
-        </div>
+          <!-- Prothésiste (pré-rempli, readonly) -->
+          <div class="form-group">
+            <label>Prothésiste</label>
+            <span id="prothesisteName" class="readonly-field"></span>
+          </div>
 
-        <div class="form-group">
-          <label>Quantité</label>
-          <input type="number" value="1" />
-        </div>
+          <!-- Liste des actes -->
+          <div id="actesContainer"></div>
+          <button type="button" class="btn" id="addActeBtn">
+            Ajouter un acte
+          </button>
 
-        <div class="form-actions">
-          <button class="btn">Annuler</button>
-          <button class="btn btn-detail">Créer</button>
-        </div>
+          <!-- Commentaire -->
+          <div class="form-group">
+            <label>Commentaire</label>
+            <textarea id="comment" name="comment" rows="2"></textarea>
+          </div>
+
+          <!-- Total -->
+          <div class="fiche-total">
+            Total : <span id="totalAmount">0</span> €
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn" id="cancelAddWorksheet">
+              Annuler
+            </button>
+            <button
+              type="submit"
+              class="btn btn-detail"
+              id="createWorksheetBtn"
+            >
+              Créer
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
     <!-- ===== FOOTER ===== -->
     <footer>© 2025 – Application Fiches Dentaires</footer>
+    <script src="/js/dentiste.js"></script>
   </body>
 </html>

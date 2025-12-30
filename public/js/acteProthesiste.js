@@ -5,6 +5,7 @@ const acteSelect = document.getElementById("acteSelect");
 const addBtn = document.getElementById("addActeBtn");
 const priceInput = document.getElementById("actePrice");
 const tableBody = document.getElementById("catalogTableBody");
+const btnHome = document.getElementById("home");
 
 if (!token || role !== "prothesiste" || isTokenExpired(token)) {
   localStorage.removeItem("token");
@@ -23,6 +24,11 @@ function isTokenExpired(token) {
     return true; // token invalide
   }
 }
+
+// Bouton Fiches travaux
+btnHome.addEventListener("click", () => {
+    window.location.href = "/prothesiste.html"
+})
 
 async function loadCatalogueActes() {
   try {

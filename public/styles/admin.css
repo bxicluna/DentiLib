@@ -197,6 +197,20 @@ tbody tr:hover {
     }
 }
 
+.modal-table-wrapper table {
+    display: block;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.modal-table-wrapper table thead,
+.modal-table-wrapper table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
 #dentisteContainer table tbody tr {
   cursor: pointer;
 }
@@ -204,20 +218,20 @@ tbody tr:hover {
 #dentisteContainer table tbody tr:hover {
   background-color: #1e293b;
 }
-
+/*
 #dentisteContainer table {
-  display: block;       /* pour que scroll fonctionne */
-  max-height: 200px;    /* hauteur max du tableau */
-  overflow-y: auto;     /* scroll vertical */
+  display: block;        pour que scroll fonctionne 
+  max-height: 200px;     hauteur max du tableau 
+  overflow-y: auto;      scroll vertical 
   width: 100%;
 }
 
 #dentisteContainer table thead,
 #dentisteContainer table tbody tr {
-  display: table;       /* garder la structure du tableau */
+  display: table;        garder la structure du tableau 
   width: 100%;
   table-layout: fixed;
-}
+}*/
 
 .modal-content h2 {
     margin-bottom: 1.5rem;

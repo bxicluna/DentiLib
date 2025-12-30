@@ -1,130 +1,337 @@
 /* Titre principal dentiste */
 #dentisteContainer h2 {
-    font-size: 1.3rem;
-    font-weight: 600;
+  font-size: 1.3rem;
+  font-weight: 600;
 }
 
 /* Bouton création fiche */
 #btnOpenCreate {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 /* ===== TABLE DENTISTE ===== */
 #dentisteContainer table tbody tr {
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 #dentisteContainer table tbody tr:hover {
-    background-color: #1e293b;
+  background-color: #1e293b;
 }
 
 /* Ligne sélectionnée */
 #dentisteTableBody tr.selected {
-    background-color: #0284c7;
-    color: white;
+  background-color: #0284c7;
+  color: white;
 }
 
 /* Alignement colonne actions */
 #dentisteContainer td:last-child {
-    text-align: center;
+  text-align: center;
+}
+
+.dentiste-table-wrapper {
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
 }
 
 /* ===== STATUS SPECIFIQUES ===== */
 .status-en-cours {
-    background-color: #075985;
-    color: #bae6fd;
+  background-color: #075985;
+  color: #bae6fd;
 }
 
 .status-termine {
-    background-color: #166534;
-    color: #bbf7d0;
+  background-color: #166534;
+  color: #bbf7d0;
 }
 
-.status-livre {
-    background-color: #374151;
-    color: #e5e7eb;
+.status-en-attente {
+  background-color: #374151;
+  color: #e5e7eb;
 }
 
 /* ===== MODAL DENTISTE ===== */
 #createModal .modal-content {
-    max-width: 600px;
+  max-width: 800px; /* plus large si nécessaire */
+  width: 100%;
+  padding: 2rem;
+  background-color: #020617;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  position: relative;
+  overflow-y: auto;
+  max-height: 90vh;
+  min-width: 0; /* important pour grid */
 }
 
-/* Champs patient côte à côte */
+/* Titre */
+#createModal h2 {
+  color: #38bdf8;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Bouton fermer */
+#createModal .close-modal {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 22px;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+#createModal .close-modal:hover {
+  color: #38bdf8;
+}
+
+/* Form groups */
+
 .patient-row {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  gap: 1rem; /* espace entre nom et prénom */
 }
 
 .patient-row .form-group {
-    flex: 1;
+  flex: 1; /* chaque input prend la moitié de l'espace */
+}
+
+.readonly-field {
+  display: block;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  background-color: #334155;
+  color: #e5e7eb;
+}
+
+#createModal .form-group {
+  margin-bottom: 1rem;
+}
+
+#createModal .form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #d1d5db;
+}
+
+#createModal .form-group input,
+#createModal .form-group select,
+#createModal .form-group textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #020617;
+  color: #e5e7eb;
+}
+
+#createModal .form-group input:focus,
+#createModal .form-group select:focus,
+#createModal .form-group textarea:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+/* Boutons */
+#createModal .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+#createModal .btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: #1f2933;
+  color: #38bdf8;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+#createModal .btn:hover {
+  background-color: #334155;
+}
+
+/* Container des actes */
+#actesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Ligne d’acte */
+.acte-row {
+  display: grid;
+  grid-template-columns: 2fr 80px 50px 40px; /* Nom / Prix / Qté / bouton */
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  background-color: #0f172a;
+}
+
+/* Select et input prix */
+.acte-row select,
+.acte-row input.actePrice {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #334155;
+  background-color: #020617;
+  color: #e5e7eb;
+}
+
+.acte-row select:focus,
+.acte-row input:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+/* Quantité + bouton supprimer */
+.quantity-delete {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.quantity-delete .acteQuantity {
+  width: 50px;
+  padding: 0.3rem 0.4rem;
+  text-align: center;
+  border-radius: 4px;
+  border: 1px solid #334155;
+  background-color: #020617;
+  color: #e5e7eb;
+}
+
+/* Bouton supprimer (croix) */
+.btn-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-delete-acte {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  border-radius: 4px;
+  border: none;
+  background-color: #7f1d1d;
+  color: #fecaca;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-delete-acte:hover {
+  background-color: #991b1b;
+}
+
+/* Total */
+.fiche-total {
+  margin-top: 0.5rem;
+  padding: 0.8rem;
+  background-color: #020617;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  text-align: right;
+  font-weight: bold;
+  color: #38bdf8;
+  font-size: 1rem;
+}
+
+/* Bouton ajouter acte */
+#addActeBtn {
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #166534;
+  color: #bbf7d0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#addActeBtn:hover {
+  background-color: #14532d;
 }
 
 /* ===== FORM ACTES ===== */
-.acte-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1rem;
-}
 
 /* Total fiche */
 .fiche-total {
-    margin-top: 1rem;
-    padding: 0.8rem;
-    background-color: #020617;
-    border: 1px solid #334155;
-    border-radius: 6px;
-    text-align: right;
-    font-weight: bold;
-    color: #38bdf8;
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background-color: #020617;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  text-align: right;
+  font-weight: bold;
+  color: #38bdf8;
 }
 
 /* ===== BADGE PAIEMENT ===== */
 .badge-payee {
-    background-color: #14532d;
-    color: #bbf7d0;
+  background-color: #14532d;
+  color: #bbf7d0;
 }
 
 .badge-non-payee {
-    background-color: #7f1d1d;
-    color: #fecaca;
+  background-color: #7f1d1d;
+  color: #fecaca;
 }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+  }
 
-    .filters {
-        flex-direction: column;
-    }
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 
-    .admin-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
+  table thead {
+    display: none;
+  }
 
-    table thead {
-        display: none;
-    }
+  table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
 
-    table tbody tr {
-        display: block;
-        margin-bottom: 1rem;
-        border: 1px solid #334155;
-        border-radius: 8px;
-        padding: 0.5rem;
-    }
+  table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+  }
 
-    table tbody td {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.5rem;
-    }
+  table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #9ca3af;
+  }
 
-    table tbody td::before {
-        content: attr(data-label);
-        font-weight: 600;
-        color: #9ca3af;
-    }
+  .acte-row {
+    grid-template-columns: 1fr 1fr; /* Nom / Prix+Quantité */
+    grid-template-rows: auto auto;
+    gap: 0.5rem;
+  }
+
+  .acte-row button {
+    grid-column: 1 / -1;
+  }
 }
