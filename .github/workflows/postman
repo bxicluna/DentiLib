@@ -1,0 +1,43 @@
+name: Tests postman
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  postman-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+
+      - name: Install packages
+        run: npm install
+
+      - name: Install Newman et htmlextra
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Lancer le serveur
+        run: node server.js &
+          SERVER_PID=$!
+
+          npx wait-on http://localhost:3000
+
+      - name: Run postman tests 
+        run: |
+          newman run ./postman/DentiLib.postman_collection.json -e ./postman/dentilib-backend.postman_environment.json -r htmlextra --reporter-htmlextra-export newman-report/report.html
+
+      - name: Kill server 
+        run: kill $(lsof -t -i:3000)
+
+      - name: Upload Postman report
+        uses: actions/upload-artifact@v4
+        with: 
+          name: newman-postman-report
+          path: newman-report/report.html
