@@ -60,13 +60,7 @@ describe("Login page DentiLib", () => {
 
   // Tester la redirection ver la page admin.html lors de la connexion
   it("Tester la redirection après le login", () => {
-    cy.intercept("POST", "/api/user/login", {
-      statusCode: 200,
-      body: {
-        role: "admin",
-      },
-    }).as("loginRequest");
-
+    
     cy.get("#email").type("blandine@gmail.com");
     cy.get("#password").type("Admin123");
     cy.get("#submitButton").click();

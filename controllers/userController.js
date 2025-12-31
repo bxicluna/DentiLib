@@ -88,7 +88,7 @@ exports.login = async (req, res) => {
     );
 
     res.json({
-      message: `Vous êtes connecté ${user.firstName}`,
+      message: `Vous êtes connecté`,
       token,
       role: user.role,
     });

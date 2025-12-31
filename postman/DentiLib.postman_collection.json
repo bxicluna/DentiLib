@@ -8,16 +8,426 @@
 	},
 	"item": [
 		{
+			"name": "Worksheet",
+			"item": [
+				{
+					"name": "create worksheet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"comment\": \"premiere fiche travaux\",\r\n    \"patientFirstName\": \"Thomas\",\r\n    \"patientLastName\": \"Laoru\",\r\n    \"patientEmail\": \"tomas@gmail.com\",\r\n    \"patientNumSecu\": \"1235\",\r\n    \"actes\": [{\"acteName\": \"Couronne dentaire\",\r\n    \"quantity\": 1}]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/worksheet/createWorksheet",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"worksheet",
+								"createWorksheet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get worksheets by user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/worksheet/getWorksheetByUser",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"worksheet",
+								"getWorksheetByUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get worksheet by id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/worksheet/getWorksheetById/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"worksheet",
+								"getWorksheetById",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "694e713afd21ba7e691a252b"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete worksheet by id",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/worksheet/deleteWorksheet/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"worksheet",
+								"deleteWorksheet",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "69528a55202ba82b51deb749"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update worksheet",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/worksheet/updateWorksheet/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"worksheet",
+								"updateWorksheet",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "69528a55202ba82b51deb749"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"Termine\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/worksheet/updateStatus/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"worksheet",
+								"updateStatus",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "69524955f7b43472a561334c"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Acte",
+			"item": [
+				{
+					"name": "add acte",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"acteName\": \"Rebasage de prothèse\",\r\n    \"price\": \"70\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/acte/addActe",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"acte",
+								"addActe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update acte",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"price\": \"70\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/acte/updateActe/:acteId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"acte",
+								"updateActe",
+								":acteId"
+							],
+							"variable": [
+								{
+									"key": "acteId",
+									"value": "694e7862f1a8ecec8a527b79"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete acte",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/acte/deleteActe/:acteId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"acte",
+								"deleteActe",
+								":acteId"
+							],
+							"variable": [
+								{
+									"key": "acteId",
+									"value": "694e7862f1a8ecec8a527b79"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMyActes",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/acte/getMyActes",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"acte",
+								"getMyActes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get Prothesiste Actes",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenAdmin}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/acte/getProthesisteActes/:prothesisteId",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"acte",
+								"getProthesisteActes",
+								":prothesisteId"
+							],
+							"variable": [
+								{
+									"key": "prothesisteId",
+									"value": "694e713afd21ba7e691a252b"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "create admin",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"\r",
 							"const statusCode = pm.response.code\r",
-							"\r",
 							"const reponse = pm.response.json()\r",
+							"const emailRegex = /^((?!\\.)[\\w\\-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$/\r",
+							"\r",
 							"pm.test(\"The response must be JSON\", function () {\r",
 							"    pm.response.to.be.json\r",
 							"})\r",
@@ -26,42 +436,24 @@
 							"    pm.test((\"Il y a un message d'erreur dans la réponse\"), () => {\r",
 							"        pm.expect(reponse.message).to.eql(\"Email déjà utilisé\")\r",
 							"    })\r",
-							"}\r",
+							"    if (statusCode == 400) {\r",
+							"        if (pm.iterationData.get(\"emailCreation\") == \"\") {\r",
+							"            pm.test(\"Tous les champs sont requis\", function () {\r",
+							"                pm.expect(reponse.message).to.eql(\"Merci de remplir tous les champs\")\r",
+							"            })\r",
+							"        }\r",
 							"\r",
-							"if (statusCode == 201) {\r",
-							"    pm.test((\"Check if body have properties Message and admin\"), () => {\r",
-							"        pm.expect(reponse).to.have.property(\"message\");\r",
-							"        pm.expect(reponse).to.have.property(\"admin\");\r",
-							"    })\r",
-							"    pm.test((\"Le message indique que l'utilisateur est créé\"), () => {\r",
-							"        pm.expect(reponse.message).to.eql(\"Utilisateur créé\")\r",
-							"    })\r",
-							"}\r",
-							"\r",
-							"if (statusCode == 400) {\r",
-							"    if (pm.iterationData.get(\"emailCreation\") == \"\") {\r",
-							"        pm.test(\"Tous les champs sont requis\", function () {\r",
-							"            pm.expect(reponse.message).to.eql(\"Merci de remplir tous les champs\")\r",
-							"        })\r",
+							"        if (pm.iterationData.get(\"passwordCreation\") == \"\") {\r",
+							"            pm.test(\"Tous les champs sont requis\", function () {\r",
+							"                pm.expect(reponse.message).to.eql(\"Merci de remplir tous les champs\")\r",
+							"            })\r",
+							"        } else if (pm.iterationData.get(\"passwordCreation\").length < 6) {\r",
+							"            pm.test(\"Le mot de passe doit être au moins de 6 caractères\", function () {\r",
+							"                pm.expect(reponse.message).to.eql(\"Le mot de passe doit contenir au moins 6 caractères\")\r",
+							"            })\r",
+							"        }\r",
 							"    }\r",
-							"\r",
-							"    if (pm.iterationData.get(\"passwordCreation\") == \"\") {\r",
-							"        pm.test(\"Tous les champs sont requis\", function () {\r",
-							"            pm.expect(reponse.message).to.eql(\"Merci de remplir tous les champs\")\r",
-							"        })\r",
-							"    } else if (pm.iterationData.get(\"passwordCreation\").length < 6) {\r",
-							"        pm.test(\"Le mot de passe doit être au moins de 6 caractères\", function () {\r",
-							"            pm.expect(reponse.message).to.eql(\"Le mot de passe doit contenir au moins 6 caractères\")\r",
-							"        })\r",
-							"    }\r",
-							"\r",
-							"    \r",
-							"\r",
-							"}\r",
-							"\r",
-							"\r",
-							"\r",
-							""
+							"}"
 						],
 						"type": "text/javascript",
 						"packages": {},
@@ -85,7 +477,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"{{firstName}}\",\r\n    \"lastName\": \"{{lastName}}\",\r\n    \"email\": \"{{emailCreation}}\",\r\n    \"password\": \"{{passwordCreation}}\"\r\n}",
+					"raw": "{\r\n    \"firstName\": \"admin\",\r\n    \"lastName\": \"test\",\r\n    \"email\": \"admintest@test.com\",\r\n    \"password\": \"Admin123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -118,6 +510,24 @@
 							"const statusCode = pm.response.code\r",
 							"const reponse = pm.response.json()\r",
 							"\r",
+							"pm.test(\"The response must be JSON\", function () {\r",
+							"    pm.response.to.be.json\r",
+							"})\r",
+							"\r",
+							"if (statusCode == 200) {\r",
+							"    pm.test((\"Verifier que le body a un message, token et role\"), () => {\r",
+							"        pm.expect(reponse).to.have.property(\"message\");\r",
+							"        pm.expect(reponse).to.have.property(\"token\");\r",
+							"        pm.expect(reponse).to.have.property(\"role\");\r",
+							"    })\r",
+							"    pm.test((\"Le message indique que l'utilisateur est connecte\"), () => {\r",
+							"        pm.expect(reponse.message).to.eql(\"Vous êtes connecté\")\r",
+							"    })\r",
+							"    pm.test((\"Le role de l'utilisateur est admin\"), () => {\r",
+							"        pm.expect(reponse.role).to.eql(\"admin\")\r",
+							"    })\r",
+							"}\r",
+							"\r",
 							"if(statusCode == 401){\r",
 							"    pm.test((\"Le mot de passe est incorrect\"), () => {\r",
 							"        pm.expect(reponse.message).to.eql(\"Mot de passe incorrect\")\r",
@@ -128,7 +538,15 @@
 							"    pm.test((\"L'utilisateur n'existe pas\"), () => {\r",
 							"        pm.expect(reponse.message).to.eql(\"L'utilisateur n'existe pas\")\r",
 							"    })\r",
-							"}"
+							"}\r",
+							"\r",
+							"if (statusCode == 400) {\r",
+							"    pm.test((\"Merci de remplir tous les champs\"), () => {\r",
+							"        pm.expect(reponse.message).to.eql(\"Merci de remplir tous les champs\")\r",
+							"    })\r",
+							"}\r",
+							"\r",
+							""
 						],
 						"type": "text/javascript",
 						"packages": {},
@@ -152,7 +570,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\": \"{{emailLogin}}\",\r\n    \"password\": \"{{passwordLogin}}\"\r\n}",
+					"raw": "{\r\n    \"email\": \"admintest@test.com\",\r\n    \"password\": \"Admin123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -174,6 +592,64 @@
 			"response": []
 		},
 		{
+			"name": "create acte",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"acteName\": \"Gouttière occlusale\",\r\n    \"acteDescription\": \"Gouttière sur mesure utilisée pour appliquer un gel de blanchiment dentaire.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/admin/createActe",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"createActe"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "create user (prothesiste)",
 			"request": {
 				"method": "POST",
@@ -186,7 +662,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"lastName\": \"Espenel\",\r\n    \"firstName\": \"Louise\",\r\n    \"email\": \"espenellouise@gmail.com\",\r\n    \"role\": \"prothesiste\",\r\n    \"password\": \"Admin123\",\r\n    \"siret\": \"12345678900013\",\r\n    \"associatedUser\": \"693c43f85c97140eceb57bf7\"\r\n}",
+					"raw": "{\r\n    \"lastName\": \"Laurne\",\r\n    \"firstName\": \"Marine\",\r\n    \"email\": \"prothesiste@gmail.com\",\r\n    \"role\": \"prothesiste\",\r\n    \"password\": \"Admin123\",\r\n    \"siret\": \"12345678900013\",\r\n    \"dentisteId\": \"694912e0d0c58bb595091fb0\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -194,13 +670,47 @@
 					}
 				},
 				"url": {
-					"raw": "{{BASE_URL}}/api/user/registerUser",
+					"raw": "{{BASE_URL}}/api/admin/createAccount",
 					"host": [
 						"{{BASE_URL}}"
 					],
 					"path": [
 						"api",
-						"user",
+						"admin",
+						"createAccount"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create user (dentiste)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"lastName\": \"Helene\",\r\n    \"firstName\": \"Marile\",\r\n    \"email\": \"marile@gmail.com\",\r\n    \"role\": \"dentiste\",\r\n    \"password\": \"Admin123\",\r\n    \"siret\": \"12345678900012\"\r\n\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/admin/registerUser",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"admin",
 						"registerUser"
 					]
 				}
@@ -236,7 +746,7 @@
 					"variable": [
 						{
 							"key": "userId",
-							"value": "69412ab1288f9effe65db3dd"
+							"value": "69491ab818654d461438c7b3"
 						}
 					]
 				}
@@ -255,6 +765,13 @@
 						"type": "text/javascript",
 						"packages": {},
 						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -285,6 +802,214 @@
 						"api",
 						"user",
 						"deleteMyAccount"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get users without admin",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/admin/getUserWithoutAdmin",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"getUserWithoutAdmin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all actes",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/admin/getAllActes",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"getAllActes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all dentistes",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/admin/getAllDentistes",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"getAllDentistes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteActe",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}/api/admin/deleteActe/:acteId",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"deleteActe",
+						":acteId"
+					],
+					"variable": [
+						{
+							"key": "acteId",
+							"value": "6949594f2049e128b11e746d"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user by id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/user/getUser/:userId",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"user",
+						"getUser",
+						":userId"
+					],
+					"variable": [
+						{
+							"key": "userId",
+							"value": "694e713afd21ba7e691a252b"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update user",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenAdmin}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"blandine\",\r\n    \"lastName\": \"xicluna\",\r\n    \"email\": \"xicluna.blandnine@gmail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/admin/updateUser/:id",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"updateUser",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "6954e3c52a6540edb9863eb3"
+						}
 					]
 				}
 			},

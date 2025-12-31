@@ -1,0 +1,31 @@
+name: Tests cypress
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build_and_cypress:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+
+      - name: Install packages
+        run: npm install
+
+      - name: Start server
+        run: node server.js &
+             SERVER_PID=$!
+
+             npx wait-on http://localhost:3000
+
+             npm run cypress:run
+
+             kill $SERVER_PID
