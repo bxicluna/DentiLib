@@ -17,7 +17,6 @@
 
         <form id="acteForm">
           <div class="form-group">
-
             <input type="hidden" id="acteId" />
 
             <label for="acteName">Nom de l’acte</label>
@@ -26,8 +25,10 @@
 
           <div class="form-group">
             <label for="acteDescription">Description</label>
-            <input type="text" id="acteDescr"/>
+            <input type="text" id="acteDescr" />
           </div>
+
+          <div id="acteMessage" class="message-modal"></div>
 
           <div class="form-actions">
             <button type="submit" class="btn">Enregistrer</button>
@@ -44,27 +45,40 @@
       <div class="admin-name">Liste des actes</div>
 
       <div class="header-actions">
-        <button class="btn" id="openActeModal">Ajouter un acte</button>
         <button class="btn" id="backAdmin">Liste des utilisateurs</button>
+        <button class="btn btn-logout" id="logout">Se déconnecter</button>
       </div>
     </header>
 
     <!-- CONTENU -->
     <main>
       <section class="admin-container">
-      <!--<div class="filters">
-          <input
-            id="searchActe"
-            type="text"
-            placeholder="Rechercher un acte"
-          />
-        </div>-->
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+          "
+        >
+          <h2 style="color: #38bdf8">Actes</h2>
+          <button class="btn" id="openActeModal">Ajouter un acte</button>
+        </div>
+        <div id="acteGlobalMessage" class="message-system"></div>
 
         <table>
+          <colgroup>
+            <col style="width: 28%" />
+            <!-- Nom -->
+            <col style="width: 62%" />
+            <!-- Description -->
+            <col style="width: 10%" />
+            <!-- Actions -->
+          </colgroup>
           <thead>
             <tr>
               <th>Nom</th>
               <th>Description</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="acteTableBody"></tbody>

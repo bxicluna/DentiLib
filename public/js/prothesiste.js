@@ -14,28 +14,40 @@ const patientFirstNameInput = document.getElementById("patientFirstName");
 const patientLastNameInput = document.getElementById("patientLastName");
 const loader = document.getElementById("worksheetLoader");
 const emptyMessage = document.getElementById("emptyMessage");
+const messageSystem = document.getElementById("messageSystem");
 
 let allWorksheets = [];
 
 // Token
-if (!token || role !== "prothesiste" || isTokenExpired(token)) {
-  localStorage.removeItem("token");
-  localStorage.removeItem("role");
+function checkAuthAndInit() {
+  if (!token || role !== "prothesiste" || isTokenExpired(token)) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
 
-  alert("Session expirée, veuillez vous reconnecter");
-  window.location.href = "/login.html";
-} else {
+    showMessage("Session expirée, veuillez vous reconnecter");
+
+    setTimeout(() => {
+      window.location.href = "/login.html";
+    }, 1500);
+
+    return false;
+  }
+
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
     const prenom = payload.firstName || "Prothesiste";
     const nom = payload.lastName || "";
-    const role = payload.role || "";
-    // Mettre à jour le texte
+    const userRole = payload.role || "";
+
     ProthesisteNameDiv.textContent = `🦷 ${prenom} ${nom} (${
-      role.charAt(0).toUpperCase() + role.slice(1)
+      userRole.charAt(0).toUpperCase() + userRole.slice(1)
     })`;
+
+    return true;
   } catch (err) {
     console.error("Erreur récupération nom prothesiste depuis le token :", err);
+    showMessage("Erreur de session, veuillez vous reconnecter");
+    return false;
   }
 }
 
@@ -46,6 +58,18 @@ function isTokenExpired(token) {
     return payload.exp < now;
   } catch (e) {
     return true; // token invalide
+  }
+}
+
+// Fonction pour afficher les erreur au bon format
+function showMessage(text, type = "error") {
+  messageSystem.textContent = text;
+  messageSystem.style.display = "block";
+
+  if (type === "error") {
+    messageSystem.style.color = "red";
+  } else {
+    messageSystem.style.color = "green";
   }
 }
 
@@ -75,18 +99,44 @@ prothesisteTableBody.addEventListener("click", (e) => {
 async function loadProthesisteWorksheet() {
   try {
     prothesisteTableBody.innerHTML = "";
+    messageSystem.style.display = "none";
 
     const res = await fetch("/api/worksheet/getWorksheetByUser", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    allWorksheets = await res.json();
+    // 1️⃣ Cas session expirée ou non autorisée
+    if (res.status === 401) {
+      localStorage.clear();
+      showMessage("Session expirée, veuillez vous reconnecter");
 
+      setTimeout(() => {
+        window.location.href = "/login.html";
+      }, 1500);
+      return;
+    }
+
+    // 2️⃣ Cas autres erreurs HTTP
+    if (!res.ok) {
+      let errorMsg = "Erreur lors du chargement des fiches";
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || errorMsg;
+      } catch (e) {
+        // si pas de JSON valide
+        errorMsg = "Erreur serveur, veuillez réessayer plus tard";
+      }
+      showMessage(errorMsg);
+      return;
+    }
+
+    // 3️⃣ Cas succès
+    const data = await res.json();
+    allWorksheets = data;
     displayWorksheets(allWorksheets);
   } catch (error) {
-    console.error("Erreur lors du chargement des fiches travaux", error);
-    emptyMessage.textContent = "Erreur lors du chargement des fiches";
-    emptyMessage.style.display = "block";
+    console.error(error);
+    showMessage("Erreur serveur, veuillez réessayer plus tard");
   }
 }
 
@@ -167,4 +217,6 @@ function filterWorksheets() {
   displayWorksheets(filtered);
 }
 
-loadProthesisteWorksheet();
+if (checkAuthAndInit()) {
+  loadProthesisteWorksheet();
+}

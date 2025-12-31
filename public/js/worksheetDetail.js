@@ -45,6 +45,23 @@ function isTokenExpired(token) {
   }
 }
 
+function showMessage(text, type = "error") {
+  const messageSystem = document.getElementById("messageSystem");
+  messageSystem.textContent = text;
+  messageSystem.style.display = "block";
+
+  if (type === "error") {
+    messageSystem.classList.remove("success");
+  } else {
+    messageSystem.classList.add("success");
+  }
+
+  // Optionnel: disparaît après 3s
+  setTimeout(() => {
+    messageSystem.style.display = "none";
+  }, 3000);
+}
+
 async function loadWorksheet() {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
@@ -154,7 +171,9 @@ function addActeRow(acte = {}, isExisting = true) {
       }
     </select>
 
-    <input type="number" class="actePrice" value="${acte.price || 0}" readonly />
+    <input type="number" class="actePrice" value="${
+      acte.price || 0
+    }" readonly />
     <input type="number" class="acteQuantity" value="${
       acte.quantity || 1
     }" min="1" />
@@ -214,6 +233,11 @@ if (role == "dentiste") {
         if (acteName) actes.push({ acteName, price, quantity });
       });
 
+      if (actes.length === 0) {
+        showMessage("Vous devez ajouter au moins un acte", "error");
+        return;
+      }
+
       const total = parseFloat(totalAmountInput.textContent) || 0;
 
       const body = {
@@ -235,13 +259,21 @@ if (role == "dentiste") {
         body: JSON.stringify(body),
       });
 
-      if (!res.ok) throw new Error("Erreur sauvegarde fiche");
+      if (!res.ok) {
+        let errorMsg = "Impossible de sauvegarder la fiche";
+        try {
+          const data = await res.json();
+          errorMsg = data.message || errorMsg;
+        } catch {}
+        showMessage(errorMsg, "error");
+        return;
+      }
 
-      alert("Fiche mise à jour avec succès !");
+      showMessage("Fiche mise à jour avec succès !", "success");
       loadWorksheet();
     } catch (err) {
       console.error(err);
-      alert("Impossible de sauvegarder la fiche");
+      showMessage("Erreur serveur, veuillez réessayer plus tard", "error");
     }
   });
 
@@ -254,13 +286,28 @@ if (role == "dentiste") {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Erreur suppression fiche");
+      if (!res.ok) {
+        let errorMsg = "Impossible de supprimer la fiche";
+        try {
+          const data = await res.json();
+          errorMsg = data.message || errorMsg;
+        } catch {}
+        showMessage(errorMsg, "error");
+        return;
+      }
 
-      alert("Fiche supprimée !");
-      window.location.href = "/dentiste.html";
+      //showMessage("Fiche supprimée avec succès !", "success"); // facultatif ici pour l'effet immédiat
+      // Stocker un message temporaire
+      localStorage.setItem(
+        "messageFromDetail",
+        "Fiche supprimée avec succès !"
+      );
+      // Redirection
+      window.location.href =
+        role === "dentiste" ? "/dentiste.html" : "/prothesiste.html";
     } catch (err) {
       console.error(err);
-      alert("Impossible de supprimer la fiche");
+      showMessage("Erreur serveur, veuillez réessayer plus tard", "error");
     }
   });
 }

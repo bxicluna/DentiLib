@@ -65,6 +65,10 @@ exports.updateActePrice = async (req, res) => {
     console.log(prothesiste.actesList);
     console.log(acteId);
 
+    if (price < 0) return res.status(400).json({ message: "Le prix doit etre supérieur à 0" });
+    console.log(prothesiste.actesList);
+    console.log(acteId);
+
     const acteIndex = prothesiste.actesList.findIndex(
       (a) => a._id.toString() === acteId
     );

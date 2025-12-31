@@ -6,14 +6,17 @@ const addBtn = document.getElementById("addActeBtn");
 const priceInput = document.getElementById("actePrice");
 const tableBody = document.getElementById("catalogTableBody");
 const btnHome = document.getElementById("home");
+const messageSystem = document.getElementById("messageSystem");
 
 if (!token || role !== "prothesiste" || isTokenExpired(token)) {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
+  showMessage("Session expirée, veuillez vous reconnecter");
 
-  alert("Session expirée, veuillez vous reconnecter");
-  window.location.href = "/login.html";
-}
+  setTimeout(() => {
+    window.location.href = "/login.html";
+  }, 1500);
+} 
 
 function isTokenExpired(token) {
   try {
@@ -25,6 +28,25 @@ function isTokenExpired(token) {
   }
 }
 
+function showMessage(text, type = "error") {
+  messageSystem.textContent = text;
+  messageSystem.style.display = "block";
+
+  if (type === "error") {
+    messageSystem.classList.remove("success");
+    messageSystem.style.color = "red";
+  } else {
+    messageSystem.classList.add("success");
+    messageSystem.style.color = "green";
+  }
+
+  // Optionnel : disparaît après 3 secondes
+  setTimeout(() => {
+    messageSystem.style.display = "none";
+  }, 3000);
+}
+
+
 // Bouton Fiches travaux
 btnHome.addEventListener("click", () => {
     window.location.href = "/prothesiste.html"
@@ -33,23 +55,38 @@ btnHome.addEventListener("click", () => {
 async function loadCatalogueActes() {
   try {
     const res = await fetch("/api/admin/getAllActes", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
 
+    if (res.status === 401) {
+      localStorage.clear();
+      showMessage("Session expirée, veuillez vous reconnecter");
+      setTimeout(() => window.location.href = "/login.html", 1500);
+      return;
+    }
+
+    if (!res.ok) {
+      let errorMsg = "Erreur lors du chargement des actes";
+      try {
+        const data = await res.json();
+        errorMsg = data.message || errorMsg;
+      } catch {}
+      showMessage(errorMsg);
+      return;
+    }
+
     const actes = await res.json();
-
     acteSelect.innerHTML = `<option value="">-- Choisir un acte --</option>`;
-
-    actes.forEach((acte) => {
+    actes.forEach(acte => {
       const option = document.createElement("option");
       option.value = acte.acteName;
       option.textContent = acte.acteName;
       acteSelect.appendChild(option);
     });
+
   } catch (err) {
-    console.error("Erreur chargement des actes", err);
+    console.error(err);
+    showMessage("Erreur serveur, veuillez réessayer plus tard");
   }
 }
 
@@ -107,24 +144,44 @@ addBtn.addEventListener("click", async () => {
   const price = priceInput.value;
 
   if (!acteName || !price) {
-    alert("Merci de choisir un acte et un prix");
+    showMessage("Merci de choisir un acte et un prix");
     return;
   }
 
-  await fetch("/api/acte/addActe", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    body: JSON.stringify({ acteName, price }),
-  });
+  try {
+    const res = await fetch("/api/acte/addActe", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ acteName, price }),
+    });
 
-  priceInput.value = "";
-  acteSelect.innerHTML = `<option value="">-- Choisir un acte --</option>`;
+    if (res.status === 401) {
+      localStorage.clear();
+      showMessage("Session expirée, veuillez vous reconnecter");
+      setTimeout(() => window.location.href = "/login.html", 1500);
+      return;
+    }
 
-  loadProthesistActes()
+    if (!res.ok) {
+      let errorMsg = "Impossible d’ajouter l’acte";
+      try { const data = await res.json(); errorMsg = data.message || errorMsg; } catch {}
+      showMessage(errorMsg);
+      return;
+    }
 
+    showMessage("Acte ajouté avec succès", "success");
+    priceInput.value = "";
+    acteSelect.innerHTML = `<option value="">-- Choisir un acte --</option>`;
+    await loadCatalogueActes();
+    loadProthesistActes();
+
+  } catch (err) {
+    console.error(err);
+    showMessage("Erreur serveur, veuillez réessayer plus tard");
+  }
 });
 
 tableBody.addEventListener("click", async (e) => {
@@ -134,16 +191,38 @@ tableBody.addEventListener("click", async (e) => {
   const input = document.querySelector(`input[data-id="${acteListId}"]`);
   const price = input.value;
 
-  await fetch(`/api/acte/updateActe/${acteListId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({ price })
-  });
+  try {
+    const res = await fetch(`/api/acte/updateActe/${acteListId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ price }),
+    });
 
-  loadProthesistActes(); // refresh
+    if (res.status === 401) {
+      localStorage.clear();
+      showMessage("Session expirée, veuillez vous reconnecter");
+      setTimeout(() => window.location.href = "/login.html", 1500);
+      return;
+    }
+
+    if (!res.ok) {
+      let errorMsg = "Impossible de modifier le prix";
+      try { const data = await res.json(); errorMsg = data.message || errorMsg; } catch {}
+      showMessage(errorMsg);
+      await loadProthesistActes();
+      return;
+    }
+
+    showMessage("Prix mis à jour avec succès", "success");
+    await loadProthesistActes(); // refresh tableau
+
+  } catch (err) {
+    console.error(err);
+    showMessage("Erreur serveur, veuillez réessayer plus tard");
+  }
 });
 
 tableBody.addEventListener("click", async (e) => {
@@ -153,14 +232,36 @@ tableBody.addEventListener("click", async (e) => {
 
   if (!confirm("Supprimer cet acte de votre catalogue ?")) return;
 
-  await fetch(`/api/acte/deleteActe/${acteListId}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+  try {
+    const res = await fetch(`/api/acte/deleteActe/${acteListId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  loadProthesistActes(); // refresh
+    if (res.status === 401) {
+      localStorage.clear();
+      showMessage("Session expirée, veuillez vous reconnecter");
+      setTimeout(() => window.location.href = "/login.html", 1500);
+      return;
+    }
+
+    if (!res.ok) {
+      let errorMsg = "Impossible de supprimer l’acte";
+      try { const data = await res.json(); errorMsg = data.message || errorMsg; } catch {}
+      showMessage(errorMsg);
+      return;
+    }
+
+    showMessage("Acte supprimé avec succès", "success");
+    await loadProthesistActes(); // refresh tableau
+    await loadCatalogueActes();  // refresh liste déroulante
+
+  } catch (err) {
+    console.error(err);
+    showMessage("Erreur serveur, veuillez réessayer plus tard");
+  }
 });
 
 logoutButton.addEventListener("click", () => {

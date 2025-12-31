@@ -30,6 +30,7 @@ const rechercheText = document.getElementById("recherche-text");
 const selectFilter = document.getElementById("type-filter");
 const searchInput = document.getElementById("recherche-text");
 const clearSearchBtn = document.getElementById("clear-search");
+const adminNameDiv = document.getElementById("adminName");
 
 let currentEditingUserId = null;
 let selectedDentisteId = null;
@@ -40,6 +41,19 @@ if (!token || role !== "admin" || isTokenExpired(token)) {
 
   alert("Session expirée, veuillez vous reconnecter");
   window.location.href = "/login.html";
+} else {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const prenom = payload.firstName || "";
+    const nom = payload.lastName || "";
+    const role = payload.role || "";
+    // Mettre à jour le texte
+    adminNameDiv.textContent = `${prenom} ${nom} (${
+      role.charAt(0).toUpperCase() + role.slice(1)
+    })`;
+  } catch (err) {
+    console.error("Erreur récupération nom dentiste depuis le token :", err);
+  }
 }
 
 // Ouvrir la popup
@@ -136,7 +150,7 @@ async function chargerUser() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     });
     let users = await res.json();
@@ -177,9 +191,11 @@ async function chargerUser() {
           ? `${user.associatedUser.firstName} ${user.associatedUser.lastName} (${user.associatedUser.role})`
           : ""
       }</td>
-      <td>
-        <button class="btn-edit" data-user='${JSON.stringify(user)}'>✏️</button>
-        <button class="btn-delete" data-id="${user._id}">❌</button>
+      <td class="actions">
+        <div>
+          <button class="btn-edit" data-user='${JSON.stringify(user)}'>✏️</button>
+          <button class="btn-delete" data-id="${user._id}">❌</button>
+        </div>
       </td>
   `;
 
@@ -351,6 +367,10 @@ roleForm.addEventListener("change", () => {
     dentisteContainer.classList.add("hidden");
     dentisteTableBody.innerHTML = "";
     selectedDentisteId = null;
+  } else if (roleForm.value == "admin") {
+    siretContainer.classList.add("hidden");
+    dentisteContainer.classList.add("hidden");
+    dentisteTableBody.innerHTML = "";
   }
 });
 

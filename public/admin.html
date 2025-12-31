@@ -114,10 +114,10 @@
     </div>
 
     <header class="admin-header">
-      <div class="admin-name">Nom Admin</div>
+      <div class="admin-name" id="adminName"></div>
 
       <div class="header-actions">
-        <button class="btn" id="openAddUserModal">Ajouter un user</button>
+        
         <button class="btn" id="openActList">Liste des actes</button>
         <button class="btn btn-logout" id="logout">Se déconnecter</button>
       </div>
@@ -125,6 +125,18 @@
 
     <main>
       <section class="admin-container">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+          "
+        >
+          <h2 style="color: #38bdf8">Utilisateurs</h2>
+          <button class="btn" id="openAddUserModal">
+            Ajouter un utilisateur
+          </button>
+        </div>
         <div class="filters">
           <select id="type-filter">
             <option>Tous</option>
@@ -140,12 +152,25 @@
         </div>
 
         <table>
+          <colgroup>
+            <col style="width: 22%" />
+            <!-- Nom/Prénom -->
+            <col style="width: 27%" />
+            <!-- Email -->
+            <col style="width: 12%" />
+            <!-- Role -->
+            <col style="width: 29%" />
+            <!-- Associé -->
+            <col style="width: 10%" />
+            <!-- Action -->
+          </colgroup>
           <thead>
             <tr>
               <th>Nom / Prénom</th>
               <th>Email</th>
               <th>Role</th>
               <th>Associé</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="mainUserTableBody"></tbody>

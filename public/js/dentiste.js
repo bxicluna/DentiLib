@@ -18,20 +18,30 @@ const patientLastNameInput = document.getElementById("patientLastName");
 const patientEmailInput = document.getElementById("patientEmail");
 const patientNumSecuInput = document.getElementById("patientNumSecu");
 const commentInput = document.getElementById("comment");
-const patientFilterInput = document.querySelector(".filters input[type='text']");
+const patientFilterInput = document.querySelector(
+  ".filters input[type='text']"
+);
 const statusFilterSelect = document.querySelector(".filters select");
 const dateFilterInput = document.querySelector(".filters input[type='date']");
 const dentisteNameDiv = document.getElementById("dentistName");
+const messageSystem = document.getElementById("messageSystem");
+const messageModal = document.getElementById("messageModal");
 
 let prothesiste = null;
 let actesCatalogue = [];
 
+// Vérifier si un message existe depuis la page détail
+const messageFromDetail = localStorage.getItem("messageFromDetail");
+if (messageFromDetail) {
+  showMessage(messageFromDetail, "success");
+  localStorage.removeItem("messageFromDetail"); // on le supprime pour ne pas le réafficher
+}
+
 if (!token || role !== "dentiste" || isTokenExpired(token)) {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
-
-  alert("Session expirée, veuillez vous reconnecter");
-  window.location.href = "/login.html";
+  showMessage("Session expirée, veuillez vous reconnecter");
+  setTimeout(() => (window.location.href = "/login.html"), 1500);
 } else {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
@@ -57,6 +67,39 @@ function isTokenExpired(token) {
   }
 }
 
+function showModalMessage(text, type = "error") {
+  messageModal.textContent = text;
+  messageModal.style.display = "block";
+
+  if (type === "error") {
+    messageModal.classList.remove("success");
+    messageModal.style.color = "red";
+  } else {
+    messageModal.classList.add("success");
+    messageModal.style.color = "green";
+  }
+}
+
+function hideModalMessage() {
+  messageModal.style.display = "none";
+}
+
+function showMessage(text, type = "error") {
+  messageSystem.textContent = text;
+  messageSystem.style.display = "block";
+
+  if (type === "error") {
+    messageSystem.classList.remove("success");
+    messageSystem.style.color = "red";
+  } else {
+    messageSystem.classList.add("success");
+    messageSystem.style.color = "green";
+  }
+  setTimeout(() => {
+    messageSystem.style.display = "none";
+  }, 3000);
+}
+
 patientFilterInput.addEventListener("input", filterWorksheets);
 statusFilterSelect.addEventListener("change", filterWorksheets);
 dateFilterInput.addEventListener("change", filterWorksheets);
@@ -78,7 +121,7 @@ async function loadDentistesWorksheet() {
 
 function displayWorksheets(worksheets) {
   dentisteTableBody.innerHTML = "";
-console.log(worksheets)
+  console.log(worksheets);
   // Si liste vide
   if (!worksheets || worksheets.length === 0) {
     dentisteTableBody.innerHTML = `
@@ -91,17 +134,21 @@ console.log(worksheets)
     return;
   }
 
-  worksheets.forEach(ws => {
+  worksheets.forEach((ws) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${ws.numWorkSheet}</td>
       <td>${ws.patientFirstName} ${ws.patientLastName}</td>
       <td>${formatDate(ws.createdAt)}</td>
       <td>${ws.prothesisteId.firstName} ${ws.prothesisteId.lastName}</td>
-      <td><span class="status-badge status-${ws.status.toLowerCase().replace(" ", "-")}">${ws.status}</span></td>
+      <td><span class="status-badge status-${ws.status
+        .toLowerCase()
+        .replace(" ", "-")}">${ws.status}</span></td>
       <td>${ws.total}</td>
       <td>
-        <button class="btn btn-detail btn-detail-worksheet" data-id="${ws._id}">Détail</button>
+        <button class="btn btn-detail btn-detail-worksheet" data-id="${
+          ws._id
+        }">Détail</button>
       </td>
     `;
     dentisteTableBody.appendChild(tr);
@@ -113,7 +160,7 @@ function filterWorksheets() {
   const statusFilter = statusFilterSelect.value.trim().toLowerCase();
   const dateFilter = dateFilterInput.value; // format "yyyy-mm-dd"
 
-  const filtered = allWorksheets.filter(ws => {
+  const filtered = allWorksheets.filter((ws) => {
     // Filtre patient (nom ou prénom)
     const matchesPatient =
       ws.patientFirstName.toLowerCase().includes(patientFilter) ||
@@ -217,47 +264,68 @@ addActeBtn.addEventListener("click", () => addActeRow(actesCatalogue));
 
 async function initCreateModal() {
   try {
-    // Décoder token pour récupérer l'id du dentiste
     const payload = JSON.parse(atob(token.split(".")[1]));
     const dentisteId = payload.id;
 
-    // Récupérer le dentiste avec populate de son prothésiste
     const res = await fetch(`/api/user/getUser/${dentisteId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
+
+    if (res.status === 401) {
+      localStorage.clear();
+      showMessage("Session expirée, veuillez vous reconnecter");
+      setTimeout(() => (window.location.href = "/login.html"), 1500);
+      return;
+    }
+
+    if (!res.ok) {
+      let errorMsg = "Impossible de récupérer le catalogue du prothésiste";
+      try {
+        const data = await res.json();
+        errorMsg = data.message || errorMsg;
+      } catch {}
+      showMessage(errorMsg);
+      return;
+    }
+
     const dentiste = await res.json();
 
     if (!dentiste.associatedUser) {
-      alert("Aucun prothésiste associé !");
+      showMessage("Aucun prothésiste associé !");
       return;
     }
 
     prothesiste = dentiste.associatedUser;
-    actesCatalogue = prothesiste.actesList; // récupérer catalogue
+    actesCatalogue = prothesiste.actesList;
     prothesisteNameInput.textContent = `${prothesiste.firstName} ${prothesiste.lastName}`;
 
-    // Reset actes
     actesContainer.innerHTML = "";
-    addActeRow(actesCatalogue); // au moins une ligne obligatoire
+    addActeRow(actesCatalogue);
   } catch (err) {
-    console.error("Erreur récupération catalogue prothésiste :", err);
+    console.error(err);
+    showMessage("Erreur serveur, veuillez réessayer plus tard");
   }
 }
 
-createWorksheetBtn.addEventListener("click", async () => {
+createWorksheetForm.addEventListener("submit", async (e) => {
+  e.preventDefault(); // empêche le reload du form
+
   try {
     const actes = [];
     actesContainer.querySelectorAll(".acte-row").forEach((row) => {
       const select = row.querySelector(".acteName");
       const acteId = select.value;
-      const acteName = select.selectedOptions[0].textContent; // ajouter le nom
+      const acteName = select.selectedOptions[0].textContent;
       const price = parseFloat(row.querySelector(".actePrice").value);
       const quantity = parseInt(row.querySelector(".acteQuantity").value);
 
       if (acteId) actes.push({ acteId, acteName, price, quantity });
     });
+
+    if (actes.length === 0) {
+      showModalMessage("Vous devez ajouter au moins un acte");
+      return;
+    }
 
     const body = {
       patientFirstName: patientFirstNameInput.value,
@@ -270,7 +338,7 @@ createWorksheetBtn.addEventListener("click", async () => {
       total: parseFloat(totalAmount.textContent),
     };
 
-    await fetch("/api/worksheet/createWorksheet", {
+    const res = await fetch("/api/worksheet/createWorksheet", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -279,10 +347,29 @@ createWorksheetBtn.addEventListener("click", async () => {
       body: JSON.stringify(body),
     });
 
-    //alert("Fiche créée avec succès !");
-    createModal.classList.remove("active");
+    if (!res.ok) {
+      let errorMsg = "Impossible de créer la fiche";
+      try {
+        const data = await res.json();
+        errorMsg = data.message || errorMsg;
+      } catch {}
+      showModalMessage(errorMsg);
+      return;
+    }
+
+    // succès
+    modal.classList.remove("active");
+    loadDentistesWorksheet(); // refresh tableau
+    showMessage("Fiche créée avec succès !", "success"); // message global
+    hideModalMessage();
+
+    // reset du formulaire si tu veux
+    createWorksheetForm.reset();
+    actesContainer.innerHTML = "";
+    addActeRow(actesCatalogue);
   } catch (err) {
-    console.error("Erreur création fiche :", err);
+    console.error(err);
+    showModalMessage("Erreur serveur, veuillez réessayer plus tard");
   }
 });
 
