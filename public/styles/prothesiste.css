@@ -4,6 +4,20 @@
   text-align: center;
 }
 
+.loader {
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #38bdf8;
+  font-weight: 500;
+}
+
+.empty-message {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
 /* ===== AJOUT ACTE ===== */
 .add-acte-card {
   background-color: #020617;

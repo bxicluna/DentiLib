@@ -78,6 +78,18 @@ async function loadDentistesWorksheet() {
 
 function displayWorksheets(worksheets) {
   dentisteTableBody.innerHTML = "";
+console.log(worksheets)
+  // Si liste vide
+  if (!worksheets || worksheets.length === 0) {
+    dentisteTableBody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center;color:#9ca3af;">
+          Aucune fiche de travaux pour le moment
+        </td>
+      </tr>
+    `;
+    return;
+  }
 
   worksheets.forEach(ws => {
     const tr = document.createElement("tr");

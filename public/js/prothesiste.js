@@ -12,6 +12,8 @@ const dateFilterInput = document.querySelector(".filters input[type='date']");
 const dentisteNameDiv = document.getElementById("dentistName");
 const patientFirstNameInput = document.getElementById("patientFirstName");
 const patientLastNameInput = document.getElementById("patientLastName");
+const loader = document.getElementById("worksheetLoader");
+const emptyMessage = document.getElementById("emptyMessage");
 
 let allWorksheets = [];
 
@@ -72,6 +74,8 @@ prothesisteTableBody.addEventListener("click", (e) => {
 // Fonction pour charger les fiches travaux du prothesiste
 async function loadProthesisteWorksheet() {
   try {
+    prothesisteTableBody.innerHTML = "";
+
     const res = await fetch("/api/worksheet/getWorksheetByUser", {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -81,12 +85,28 @@ async function loadProthesisteWorksheet() {
     displayWorksheets(allWorksheets);
   } catch (error) {
     console.error("Erreur lors du chargement des fiches travaux", error);
+    emptyMessage.textContent = "Erreur lors du chargement des fiches";
+    emptyMessage.style.display = "block";
   }
 }
 
 // Fonction pour afficher les fiches travaux du prothesiste
 async function displayWorksheets(worksheets) {
   prothesisteTableBody.innerHTML = "";
+
+  // Si liste vide
+  if (!worksheets || worksheets.length === 0) {
+    prothesisteTableBody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align:center;color:#9ca3af;">
+          Aucune fiche de travaux pour le moment
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  // Si liste rempli
 
   worksheets.forEach((ws) => {
     const tr = document.createElement("tr");

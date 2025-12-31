@@ -187,6 +187,22 @@
   color: #e5e7eb;
 }
 
+/* Input quantité */
+.acte-row input.acteQuantity {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #334155;
+  background-color: #020617;
+  color: #e5e7eb;
+  text-align: center;
+}
+
+.acte-row input.acteQuantity:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
 .acte-row select:focus,
 .acte-row input:focus {
   outline: none;

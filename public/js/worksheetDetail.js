@@ -127,37 +127,24 @@ function addActeRow(acte = {}, isExisting = true) {
   const row = document.createElement("div");
   row.classList.add("acte-row");
 
-  // Si prothésiste, ajouter la classe no-delete
   if (role === "prothesiste") row.classList.add("no-delete");
 
-  // Prix et nom depuis le catalogue
-  let priceValue = "";
-  let selectedId = "";
+  // 🔑 on sélectionne par NOM
+  const selectedName = acte.acteName || "";
 
-  if (isExisting) {
-    const acteFromCatalogue = actesCatalogue.find(
-      (a) => a._id.toString() === acte.acteName
-    );
-    if (acteFromCatalogue) {
-      priceValue = acteFromCatalogue.price || acte.price || 0;
-      selectedId = acteFromCatalogue._id;
-    }
-  }
-
-  // Générer les options du select
   const optionsHTML = actesCatalogue
     .map((a) => {
-      const label =
-        typeof a.acte === "object" ? a.acte.acteName : "Acte inconnu";
+      const acteNameCatalogue = a.acte.acteName;
 
       return `
-      <option value="${a._id}" data-price="${a.price}"
-        ${a._id.toString() === selectedId ? "selected" : ""}>
-        ${label}
-      </option>
-    `;
+        <option value="${acteNameCatalogue}" data-price="${a.price}"
+          ${acteNameCatalogue === selectedName ? "selected" : ""}>
+          ${acteNameCatalogue}
+        </option>
+      `;
     })
     .join("");
+
   row.innerHTML = `
     <select class="acteName" required>
       ${
@@ -166,10 +153,11 @@ function addActeRow(acte = {}, isExisting = true) {
           : `<option value="">Sélectionner un acte</option>` + optionsHTML
       }
     </select>
-    <input type="number" class="actePrice" value="${priceValue}" readonly />
+
+    <input type="number" class="actePrice" value="${acte.price || 0}" readonly />
     <input type="number" class="acteQuantity" value="${
       acte.quantity || 1
-    }" min="1" required />
+    }" min="1" />
     <button type="button" class="btn-delete-acte">×</button>
   `;
 
@@ -179,15 +167,13 @@ function addActeRow(acte = {}, isExisting = true) {
   const deleteBtn = row.querySelector(".btn-delete-acte");
 
   if (role === "prothesiste") {
-    // Désactiver champs et masquer croix
-    selectActe.setAttribute("disabled", true);
-    quantityInput.setAttribute("readonly", true);
+    selectActe.disabled = true;
+    quantityInput.readOnly = true;
     deleteBtn.style.display = "none";
   } else {
-    // Événements pour dentiste
     selectActe.addEventListener("change", () => {
       const selected = actesCatalogue.find(
-        (a) => a._id.toString() === selectActe.value
+        (a) => a.acte.acteName === selectActe.value
       );
       priceInput.value = selected?.price || 0;
       calculerTotal();
@@ -347,83 +333,6 @@ function updateStatusBadge(status) {
       //statusSelect.classList.add("status-en-attente");
       break;
   }
-}
-
-// --- Ajouter/modifier un acte ---
-function addActeRow(acte = {}, isExisting = true) {
-  const row = document.createElement("div");
-  row.classList.add("acte-row");
-
-  // Si prothésiste, ajouter la classe no-delete
-  if (role === "prothesiste") row.classList.add("no-delete");
-
-  // Prix et nom depuis le catalogue
-  let priceValue = "";
-  let selectedId = "";
-
-  if (isExisting) {
-    const acteFromCatalogue = actesCatalogue.find(
-      (a) => a._id.toString() === acte.acteName
-    );
-    if (acteFromCatalogue) {
-      priceValue = acteFromCatalogue.price || acte.price || 0;
-      selectedId = acteFromCatalogue._id;
-    }
-  }
-
-  // Générer les options du select
-  const optionsHTML = actesCatalogue
-    .map(
-      (a) =>
-        `<option value="${a._id}" data-price="${a.price}" ${
-          a._id.toString() === selectedId ? "selected" : ""
-        }>${a.acte.acteName}</option>`
-    )
-    .join("");
-
-  row.innerHTML = `
-    <select class="acteName" required>
-      ${
-        isExisting
-          ? optionsHTML
-          : `<option value="">Sélectionner un acte</option>` + optionsHTML
-      }
-    </select>
-    <input type="number" class="actePrice" value="${priceValue}" readonly />
-    <input type="number" class="acteQuantity" value="${
-      acte.quantity || 1
-    }" min="1" required />
-    <button type="button" class="btn-delete-acte">×</button>
-  `;
-
-  const selectActe = row.querySelector(".acteName");
-  const priceInput = row.querySelector(".actePrice");
-  const quantityInput = row.querySelector(".acteQuantity");
-  const deleteBtn = row.querySelector(".btn-delete-acte");
-
-  if (role === "prothesiste") {
-    selectActe.setAttribute("disabled", true);
-    quantityInput.setAttribute("readonly", true);
-    deleteBtn.style.display = "none";
-  } else {
-    selectActe.addEventListener("change", () => {
-      const selected = actesCatalogue.find(
-        (a) => a._id.toString() === selectActe.value
-      );
-      priceInput.value = selected?.price || 0;
-      calculerTotal();
-    });
-
-    quantityInput.addEventListener("input", calculerTotal);
-
-    deleteBtn.addEventListener("click", () => {
-      row.remove();
-      calculerTotal();
-    });
-  }
-
-  actesContainer.appendChild(row);
-  calculerTotal();
 }
 
 // --- Calcul total ---
