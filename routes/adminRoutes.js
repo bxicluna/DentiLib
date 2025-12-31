@@ -12,4 +12,4 @@ router.put("/admin/updateUser/:id", authMiddleware, adminController.updateUser);
 router.put("/admin/updateActe/:acteId", authMiddleware, adminController.updateActe);
 router.delete("/admin/deleteActe/:acteId", authMiddleware, adminController.deleteActe);
 
-module.exports = router
+module.exports = router 
