@@ -1,7 +1,6 @@
-const User = require("../models/user.model.js");
-const Acte = require("../models/acte.model.js");
-const WorkSheet = require("../models/worksheet.model.js");
-const Counter = require("../models/counter.model.js");
+const User = require("../models/user.mysql.model.js");
+const Acte = require("../models/acte.mysql.model.js");
+const UserActe = require("../models/userActe.mysql.model.js");
 require("dotenv").config();
 
 exports.addActe = async (req, res) => {
@@ -12,37 +11,24 @@ exports.addActe = async (req, res) => {
       return res.status(400).json({ message: "Nom de l'acte et prix requis" });
     }
 
-    let acte = await Acte.findOne({ acteName });
+    const acte = await Acte.findOne({ where: { acteName } });
     if (!acte) {
-      return res
-        .status(404)
-        .json({ message: "Acte inexistant dans le catalogue" });
+      return res.status(404).json({ message: "Acte inexistant dans le catalogue" });
     }
 
-    const prothesiste = await User.findById(req.user.id);
+    const prothesiste = await User.findByPk(req.user.id);
     if (!prothesiste || prothesiste.role !== "prothesiste") {
-      return res.status(403).json({
-        message: "Seul un prothésiste peut ajouter des actes à son catalogue",
-      });
+      return res.status(403).json({ message: "Seul un prothésiste peut ajouter des actes à son catalogue" });
     }
 
-    // Vérifie si l'acte est déjà dans sa liste
-    const exists = prothesiste.actesList.some(
-      (a) => a.acte.toString() === acte._id.toString()
-    );
+    const exists = await UserActe.findOne({ where: { userId: prothesiste.id, acteId: acte.id } });
     if (exists) {
-      return res
-        .status(400)
-        .json({ message: "Cet acte est déjà dans votre catalogue" });
+      return res.status(400).json({ message: "Cet acte est déjà dans votre catalogue" });
     }
 
-    prothesiste.actesList.push({ acte: acte._id, price });
-    await prothesiste.save();
+    const userActe = await UserActe.create({ userId: prothesiste.id, acteId: acte.id, price });
 
-    res.status(201).json({
-      message: "Acte ajouté à votre catalogue",
-      actesListe: prothesiste.actesList,
-    });
+    res.status(201).json({ message: "Acte ajouté à votre catalogue", userActe });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -51,36 +37,26 @@ exports.addActe = async (req, res) => {
 
 exports.updateActePrice = async (req, res) => {
   try {
-    const prothesiste = await User.findById(req.user.id);
+    const prothesiste = await User.findByPk(req.user.id);
     if (!prothesiste || prothesiste.role !== "prothesiste") {
-      return res
-        .status(403)
-        .json({ message: "Seul un prothésiste peut modifier son catalogue" });
+      return res.status(403).json({ message: "Seul un prothésiste peut modifier son catalogue" });
     }
 
     const { acteId } = req.params;
     const { price } = req.body;
 
     if (!price) return res.status(400).json({ message: "Prix requis" });
-    console.log(prothesiste.actesList);
-    console.log(acteId);
+    if (price < 0) return res.status(400).json({ message: "Le prix doit être supérieur à 0" });
 
-    if (price < 0) return res.status(400).json({ message: "Le prix doit etre supérieur à 0" });
-    console.log(prothesiste.actesList);
-    console.log(acteId);
+    const userActe = await UserActe.findOne({ where: { id: acteId, userId: prothesiste.id } });
+    if (!userActe) {
+      return res.status(404).json({ message: "Acte introuvable dans votre catalogue" });
+    }
 
-    const acteIndex = prothesiste.actesList.findIndex(
-      (a) => a._id.toString() === acteId
-    );
-    if (acteIndex === -1)
-      return res
-        .status(404)
-        .json({ message: "Acte introuvable dans votre catalogue" });
+    userActe.price = price;
+    await userActe.save();
 
-    prothesiste.actesList[acteIndex].price = price;
-    await prothesiste.save();
-
-    res.json({ message: "Prix mis à jour", actesList: prothesiste.actesList });
+    res.json({ message: "Prix mis à jour", userActe });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -89,29 +65,20 @@ exports.updateActePrice = async (req, res) => {
 
 exports.deleteActe = async (req, res) => {
   try {
-    const prothesiste = await User.findById(req.user.id);
+    const prothesiste = await User.findByPk(req.user.id);
     if (!prothesiste || prothesiste.role !== "prothesiste") {
-      return res
-        .status(403)
-        .json({ message: "Seul un prothésiste peut modifier son catalogue" });
+      return res.status(403).json({ message: "Seul un prothésiste peut modifier son catalogue" });
     }
 
     const { acteId } = req.params;
 
-    const actesLengthBefore = prothesiste.actesList.length;
-
-    prothesiste.actesList = prothesiste.actesList.filter(
-      (a) => a._id.toString() !== acteId
-    );
-
-    if (prothesiste.actesList.length === actesLengthBefore) {
-      return res
-        .status(404)
-        .json({ message: "Acte introuvable dans votre catalogue" });
+    const userActe = await UserActe.findOne({ where: { id: acteId, userId: prothesiste.id } });
+    if (!userActe) {
+      return res.status(404).json({ message: "Acte introuvable dans votre catalogue" });
     }
 
-    await prothesiste.save();
-    res.json({ message: "Acte supprimé", actesList: prothesiste.actesList });
+    await userActe.destroy();
+    res.json({ message: "Acte supprimé" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -120,23 +87,16 @@ exports.deleteActe = async (req, res) => {
 
 exports.getMyActes = async (req, res) => {
   try {
-    // Vérifier que l'utilisateur est bien un prothésiste
     if (req.user.role !== "prothesiste") {
       return res.status(403).json({ message: "Accès refusé" });
     }
 
-    // Récupérer le prothésiste et populater chaque référence acte
-    const prothesiste = await User.findById(req.user.id).populate({
-      path: "actesList.acte", // populate chaque acte
-      model: "Acte",
+    const actesList = await UserActe.findAll({
+      where: { userId: req.user.id },
+      include: [Acte],
     });
 
-    if (!prothesiste) {
-      return res.status(404).json({ message: "Prothésiste introuvable" });
-    }
-
-    // Retourner la liste d'actes
-    res.json(prothesiste.actesList);
+    res.json(actesList);
   } catch (error) {
     console.error("Erreur getMyActes :", error);
     res.status(500).json({ message: "Erreur serveur" });
@@ -147,25 +107,22 @@ exports.getProthesisteActes = async (req, res) => {
   try {
     const prothesisteId = req.params.prothesisteId;
 
-    // Cherche le prothésiste et ne récupère que le catalogue d'actes
-    const prothesiste = await User.findById(prothesisteId)
-      .select("firstName lastName actesList") // récupère nom, prénom et catalogue
-      .populate({
-        path: "actesList.acte", // populate les actes si c'est un ObjectId vers une collection Acte
-        model: "Acte",
-      });
-
+    const prothesiste = await User.findByPk(prothesisteId);
     if (!prothesiste) {
       return res.status(404).json({ message: "Prothésiste introuvable" });
     }
 
-    // Retourner la liste d'actes
+    const actesList = await UserActe.findAll({
+      where: { userId: prothesisteId },
+      include: [Acte],
+    });
+
     res.json({
       prothesisteName: `${prothesiste.firstName} ${prothesiste.lastName}`,
-      actesList: prothesiste.actesList,
+      actesList,
     });
   } catch (error) {
-    console.error("Erreur getMyActes :", error);
+    console.error("Erreur getProthesisteActes :", error);
     res.status(500).json({ message: "Erreur serveur" });
   }
 };

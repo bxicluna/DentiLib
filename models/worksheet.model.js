@@ -55,13 +55,11 @@ const workSheetSchema = new mongoose.Schema(
       trim: true,
     },
     dentisteId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: Number,
       required: true,
     },
     prothesisteId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: Number,
       required: true,
     },
     total: {
