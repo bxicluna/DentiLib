@@ -10,9 +10,13 @@ const authMiddleware = (req, res, next) => {
 
     const token = authHeader.split(' ')[1]
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    req.user = decoded
-    next()
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        req.user = decoded
+        next()
+    } catch (err) {
+        return res.status(403).json({ message: 'Token manquant ou invalide' })
+    }
 }
 
 module.exports = authMiddleware
