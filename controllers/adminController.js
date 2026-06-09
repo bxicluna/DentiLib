@@ -24,8 +24,9 @@ exports.createAccount = async (req, res) => {
       return res.status(409).json({ message: "Email déjà utilisé" });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ message: "Le mot de passe doit contenir au moins 6 caractères" });
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ message: "Le mot de passe doit contenir au moins 12 caractères, une majuscule, un chiffre et un caractère spécial." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -86,7 +87,7 @@ exports.createAccount = async (req, res) => {
     return res.status(400).json({ message: "Ce role n'existe pas" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -99,7 +100,7 @@ exports.getUserWithoutAdmin = async (req, res) => {
     res.json(users);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error." });
+    return res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -109,7 +110,7 @@ exports.getAllDentistes = async (req, res) => {
     res.json(users);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error." });
+    return res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -149,7 +150,7 @@ exports.getAllActes = async (req, res) => {
     res.json(actes);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -170,7 +171,7 @@ exports.createActe = async (req, res) => {
     return res.status(201).json({ message: "Acte créé", acte });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Erreur serveur" });
   }
 };
 

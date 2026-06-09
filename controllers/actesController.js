@@ -31,7 +31,7 @@ exports.addActe = async (req, res) => {
     res.status(201).json({ message: "Acte ajouté à votre catalogue", userActe });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -59,7 +59,7 @@ exports.updateActePrice = async (req, res) => {
     res.json({ message: "Prix mis à jour", userActe });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 
@@ -81,7 +81,7 @@ exports.deleteActe = async (req, res) => {
     res.json({ message: "Acte supprimé" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Erreur serveur" });
   }
 };
 

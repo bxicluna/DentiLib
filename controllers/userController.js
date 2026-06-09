@@ -23,8 +23,9 @@ exports.registerAdmin = async (req, res) => {
       return res.status(409).json({ message: "Email déjà utilisé" });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ message: "Le mot de passe doit contenir au moins 6 caractères" });
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{12,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ message: "Le mot de passe doit contenir au moins 12 caractères, une majuscule, un chiffre et un caractère spécial." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -85,7 +86,7 @@ exports.deleteUser = async (req, res) => {
 exports.deleteMyAccount = async (req, res) => {
   try {
     if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Access denied. Admin only." });
+      return res.status(403).json({ message: "Accès refusé." });
     }
 
     const user = await User.findByPk(req.user.id);
@@ -97,7 +98,7 @@ exports.deleteMyAccount = async (req, res) => {
     return res.status(200).json({ message: "Utilisateur supprimé avec succès" });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error." });
+    return res.status(500).json({ message: "Erreur serveur." });
   }
 };
 

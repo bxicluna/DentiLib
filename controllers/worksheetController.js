@@ -90,7 +90,7 @@ exports.createWorksheet = async (req, res) => {
     res.status(201).json(worksheet);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message || "Server error" });
+    res.status(500).json({ message: error.message || "Erreur serveur" });
   }
 };
 

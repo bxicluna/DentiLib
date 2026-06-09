@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
 const app = express()
 const port = 3000
 const path = require('path')
@@ -14,6 +16,12 @@ const adminRoutes = require('./routes/adminRoutes')
 const worksheetRoutes = require('./routes/worksheetRoutes')
 const actesRoutes = require('./routes/actesRoutes')
 
+app.use(helmet())
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: false,
+}))
 app.use(express.json())
 
 // Connexion MongoDB
