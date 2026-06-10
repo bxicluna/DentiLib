@@ -180,7 +180,6 @@ async function chargerUser() {
       },
     });
     let users = await res.json();
-    console.log(users);
 
     // Récupérer les valeurs des filtres
     const roleFilter = document
