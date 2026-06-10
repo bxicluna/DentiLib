@@ -104,7 +104,7 @@ describe("POST /api/worksheet/createWorksheet", () => {
         comment: "Urgence",
       });
 
-    worksheetId = res.body._id;
+    worksheetId = res.body.id;
     expect(res.statusCode).toBe(201);
     expect(res.body.patientFirstName).toBe("Sophie");
     expect(res.body.actes).toHaveLength(1);
@@ -201,7 +201,7 @@ describe("GET /api/worksheet/getWorksheetById/:id", () => {
       .get(`/api/worksheet/getWorksheetById/${worksheetId}`)
       .set("Authorization", `Bearer ${tokenDentiste}`);
     expect(res.statusCode).toBe(200);
-    expect(res.body._id).toBe(worksheetId);
+    expect(res.body.id).toBe(worksheetId);
   });
 
   it("refuse l'accès à une fiche d'un autre dentiste", async () => {
@@ -213,7 +213,7 @@ describe("GET /api/worksheet/getWorksheetById/:id", () => {
 
   it("retourne 404 pour une fiche inexistante", async () => {
     const res = await request(serverURL)
-      .get("/api/worksheet/getWorksheetById/000000000000000000000000")
+      .get("/api/worksheet/getWorksheetById/999999")
       .set("Authorization", `Bearer ${tokenDentiste}`);
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe("Fiche introuvable");
@@ -270,7 +270,7 @@ describe("DELETE /api/worksheet/deleteWorksheet/:id", () => {
 
   it("refuse la suppression d'une fiche inexistante", async () => {
     const res = await request(serverURL)
-      .delete("/api/worksheet/deleteWorksheet/000000000000000000000000")
+      .delete("/api/worksheet/deleteWorksheet/999999")
       .set("Authorization", `Bearer ${tokenDentiste}`);
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe("Fiche introuvable");

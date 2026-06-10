@@ -1,8 +1,8 @@
 const User = require("../models/user.mysql.model.js");
 const UserActe = require("../models/userActe.mysql.model.js");
 const Acte = require("../models/acte.mysql.model.js");
-const WorkSheet = require("../models/worksheet.model.js");
-const Counter = require("../models/counter.model.js");
+const WorkSheet = require("../models/worksheet.mysql.model.js");
+const WorksheetActe = require("../models/worksheetActe.mysql.model.js");
 require("dotenv").config();
 
 exports.createWorksheet = async (req, res) => {
@@ -47,12 +47,6 @@ exports.createWorksheet = async (req, res) => {
       include: [Acte],
     });
 
-    const counter = await Counter.findOneAndUpdate(
-      { name: "worksheet" },
-      { $inc: { seq: 1 } },
-      { new: true, upsert: true }
-    );
-
     const actesValides = actesSelectiones.map((item) => {
       if (!item.acteName) throw new Error("Un acte sélectionné est invalide ou manquant");
 
@@ -65,7 +59,6 @@ exports.createWorksheet = async (req, res) => {
       if (!actePro) throw new Error(`Acte non disponible dans le catalogue du prothésiste: ${item.acteName}`);
 
       return {
-        acteId: actePro.Acte.id,
         acteName: actePro.Acte.acteName,
         price: actePro.price,
         quantity: item.quantity || 1,
@@ -75,19 +68,22 @@ exports.createWorksheet = async (req, res) => {
     const total = actesValides.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
 
     const worksheet = await WorkSheet.create({
-      numWorkSheet: counter.seq,
       comment: comment || "",
       patientFirstName,
       patientLastName,
       patientEmail,
       patientNumSecu,
-      actes: actesValides,
       total,
       dentisteId: dentiste.id,
       prothesisteId: prothesiste.id,
     });
 
-    res.status(201).json(worksheet);
+    await Promise.all(
+      actesValides.map((a) => WorksheetActe.create({ worksheetId: worksheet.id, ...a }))
+    );
+
+    const result = await WorkSheet.findByPk(worksheet.id, { include: [{ model: WorksheetActe, as: "actes" }] });
+    res.status(201).json({ ...result.toJSON(), numWorkSheet: result.id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message || "Erreur serveur" });
@@ -99,7 +95,11 @@ exports.getWorksheetByUser = async (req, res) => {
     const user = req.user;
 
     if (user.role === "dentiste") {
-      const worksheets = await WorkSheet.find({ dentisteId: user.id }).sort({ createdAt: -1 });
+      const worksheets = await WorkSheet.findAll({
+        where: { dentisteId: user.id },
+        include: [{ model: WorksheetActe, as: "actes" }],
+        order: [["createdAt", "DESC"]],
+      });
 
       const prothesisteIds = [...new Set(worksheets.map((w) => w.prothesisteId))];
       const prothesistes = await User.findAll({
@@ -109,7 +109,8 @@ exports.getWorksheetByUser = async (req, res) => {
       const prothesisteMap = Object.fromEntries(prothesistes.map((p) => [p.id, p]));
 
       const enriched = worksheets.map((w) => ({
-        ...w.toObject(),
+        ...w.toJSON(),
+        numWorkSheet: w.id,
         prothesisteId: prothesisteMap[w.prothesisteId] || { id: w.prothesisteId },
       }));
 
@@ -117,7 +118,11 @@ exports.getWorksheetByUser = async (req, res) => {
     }
 
     if (user.role === "prothesiste") {
-      const worksheets = await WorkSheet.find({ prothesisteId: user.id }).sort({ createdAt: -1 });
+      const worksheets = await WorkSheet.findAll({
+        where: { prothesisteId: user.id },
+        include: [{ model: WorksheetActe, as: "actes" }],
+        order: [["createdAt", "DESC"]],
+      });
 
       const dentisteIds = [...new Set(worksheets.map((w) => w.dentisteId))];
       const dentistes = await User.findAll({
@@ -127,7 +132,8 @@ exports.getWorksheetByUser = async (req, res) => {
       const dentisteMap = Object.fromEntries(dentistes.map((d) => [d.id, d]));
 
       const enriched = worksheets.map((w) => ({
-        ...w.toObject(),
+        ...w.toJSON(),
+        numWorkSheet: w.id,
         dentisteId: dentisteMap[w.dentisteId] || { id: w.dentisteId },
       }));
 
@@ -144,15 +150,12 @@ exports.getWorksheetById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const worksheet = await WorkSheet.findById(id);
+    const worksheet = await WorkSheet.findByPk(id, {
+      include: [{ model: WorksheetActe, as: "actes" }],
+    });
     if (!worksheet) {
       return res.status(404).json({ message: "Fiche introuvable" });
     }
-
-    const [dentiste, prothesiste] = await Promise.all([
-      User.findByPk(worksheet.dentisteId, { attributes: ["id", "firstName", "lastName", "email"] }),
-      User.findByPk(worksheet.prothesisteId, { attributes: ["id", "firstName", "lastName", "email"] }),
-    ]);
 
     if (req.user.role === "dentiste" && worksheet.dentisteId !== req.user.id) {
       return res.status(403).json({ message: "Accès refusé" });
@@ -162,7 +165,17 @@ exports.getWorksheetById = async (req, res) => {
       return res.status(403).json({ message: "Accès refusé" });
     }
 
-    res.status(200).json({ ...worksheet.toObject(), dentisteId: dentiste, prothesisteId: prothesiste });
+    const [dentiste, prothesiste] = await Promise.all([
+      User.findByPk(worksheet.dentisteId, { attributes: ["id", "firstName", "lastName", "email"] }),
+      User.findByPk(worksheet.prothesisteId, { attributes: ["id", "firstName", "lastName", "email"] }),
+    ]);
+
+    res.status(200).json({
+      ...worksheet.toJSON(),
+      numWorkSheet: worksheet.id,
+      dentisteId: dentiste,
+      prothesisteId: prothesiste,
+    });
   } catch (error) {
     console.error("Erreur getWorksheetById :", error);
     res.status(500).json({ message: "Erreur serveur" });
@@ -171,14 +184,15 @@ exports.getWorksheetById = async (req, res) => {
 
 exports.deleteWorksheet = async (req, res) => {
   try {
-    const worksheet = await WorkSheet.findById(req.params.id);
+    const worksheet = await WorkSheet.findByPk(req.params.id);
     if (!worksheet) return res.status(404).json({ message: "Fiche introuvable" });
 
     if (req.user.role !== "dentiste" || worksheet.dentisteId !== req.user.id) {
       return res.status(403).json({ message: "Action non autorisée" });
     }
 
-    await worksheet.deleteOne();
+    await WorksheetActe.destroy({ where: { worksheetId: worksheet.id } });
+    await worksheet.destroy();
     res.json({ message: "Fiche supprimée avec succès" });
   } catch (err) {
     console.error(err);
@@ -188,7 +202,7 @@ exports.deleteWorksheet = async (req, res) => {
 
 exports.updateWorksheet = async (req, res) => {
   try {
-    const worksheet = await WorkSheet.findById(req.params.id);
+    const worksheet = await WorkSheet.findByPk(req.params.id);
     if (!worksheet) return res.status(404).json({ message: "Fiche introuvable" });
 
     if (req.user.role !== "dentiste" || worksheet.dentisteId !== req.user.id) {
@@ -196,16 +210,18 @@ exports.updateWorksheet = async (req, res) => {
     }
 
     const { patientFirstName, patientLastName, patientEmail, patientNumSecu, actes, comment, total } = req.body;
-    worksheet.patientFirstName = patientFirstName;
-    worksheet.patientLastName = patientLastName;
-    worksheet.patientEmail = patientEmail;
-    worksheet.patientNumSecu = patientNumSecu;
-    worksheet.actes = actes;
-    worksheet.comment = comment;
-    worksheet.total = total;
 
-    await worksheet.save();
-    res.json(worksheet);
+    await worksheet.update({ patientFirstName, patientLastName, patientEmail, patientNumSecu, comment, total });
+
+    if (actes) {
+      await WorksheetActe.destroy({ where: { worksheetId: worksheet.id } });
+      await Promise.all(
+        actes.map((a) => WorksheetActe.create({ worksheetId: worksheet.id, acteName: a.acteName, price: a.price, quantity: a.quantity || 1 }))
+      );
+    }
+
+    const result = await WorkSheet.findByPk(worksheet.id, { include: [{ model: WorksheetActe, as: "actes" }] });
+    res.json({ ...result.toJSON(), numWorkSheet: result.id });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Erreur serveur" });
@@ -223,16 +239,14 @@ exports.updateStatus = async (req, res) => {
       return res.status(400).json({ message: "status invalide" });
     }
 
-    const ws = await WorkSheet.findById(id);
+    const ws = await WorkSheet.findByPk(id);
     if (!ws) return res.status(404).json({ message: "Fiche introuvable" });
 
     if (req.user.role !== "prothesiste" || ws.prothesisteId !== req.user.id) {
       return res.status(403).json({ message: "Accès refusé" });
     }
 
-    ws.status = status;
-    await ws.save();
-
+    await ws.update({ status });
     res.status(200).json({ message: "Statut mis à jour", status });
   } catch (err) {
     res.status(500).json({ message: "Erreur serveur", error: err });

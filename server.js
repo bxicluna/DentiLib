@@ -5,11 +5,11 @@ const cors = require('cors');
 const app = express()
 const port = 3000
 const path = require('path')
-const connectMongo = require("./config/dbConfig")
 const sequelize = require("./config/mysqlConfig")
 
-// Charge les modèles MySQL et leurs associations
+// Charge les modèles et leurs associations
 require('./models/userActe.mysql.model');
+require('./models/worksheetActe.mysql.model');
 
 const userRoutes = require('./routes/userRoutes')
 const adminRoutes = require('./routes/adminRoutes')
@@ -23,9 +23,6 @@ app.use(cors({
   credentials: false,
 }))
 app.use(express.json())
-
-// Connexion MongoDB
-connectMongo()
 
 // Connexion MySQL + création des tables si elles n'existent pas
 sequelize
