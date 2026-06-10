@@ -21,8 +21,8 @@ form.addEventListener('submit', async (event) => {
         return
     }
 
-    if(password.length < 6){
-        showMessage("Le mot de passe doit contenir au moins 6 caractères")
+    if(password.length < 12){
+        showMessage("Le mot de passe doit contenir au moins 12 caractères")
         return
     }
 

@@ -122,6 +122,11 @@ exports.updateUser = async (req, res) => {
       return res.status(400).json({ message: "Merci de remplir tous les champs" });
     }
 
+    const emailRegex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Le format de l'email est invalide" });
+    }
+
     const user = await User.findByPk(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
