@@ -313,6 +313,11 @@ async function chargerDentistes() {
 async function addUser(e) {
   e.preventDefault();
 
+  if (roleForm.value === "prothesiste" && !selectedDentisteId) {
+    showModalMessage(messageAddUser, "Veuillez sélectionner un dentiste à associer au prothésiste");
+    return;
+  }
+
   try {
     const res = await fetch("/api/admin/createAccount", {
       method: "POST",

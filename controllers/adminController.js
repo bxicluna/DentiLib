@@ -45,7 +45,7 @@ exports.createAccount = async (req, res) => {
 
     if (role === "prothesiste") {
       if (!dentisteId) {
-        return res.status(400).json({ message: "dentisteId est necessaire pour un prothesiste" });
+        return res.status(400).json({ message: "Veuillez sélectionner un dentiste à associer au prothésiste" });
       }
 
       const dentiste = await User.findByPk(dentisteId);
