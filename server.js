@@ -1,28 +1,43 @@
 require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
 const app = express()
 const port = 3000
 const path = require('path')
-const dbConnection = require("./config/dbConfig")
-require('./models/user.model.js')
+const connectMongo = require("./config/dbConfig")
+const sequelize = require("./config/mysqlConfig")
+
+// Charge les modèles MySQL et leurs associations
+require('./models/userActe.mysql.model');
+
 const userRoutes = require('./routes/userRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const worksheetRoutes = require('./routes/worksheetRoutes')
 const actesRoutes = require('./routes/actesRoutes')
 
-
+app.use(helmet())
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: false,
+}))
 app.use(express.json())
 
-//connection à la DB
-dbConnection()
+// Connexion MongoDB
+connectMongo()
 
+// Connexion MySQL + création des tables si elles n'existent pas
+sequelize
+  .sync({ alter: true })
+  .then(() => console.log("MySQL connecté et tables synchronisées !"))
+  .catch((err) => console.error("MySQL connection failed:", err.message))
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api/', userRoutes)
 app.use('/api/', adminRoutes)
 app.use('/api/worksheet/', worksheetRoutes)
 app.use('/api/acte', actesRoutes)
-
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'))

@@ -1,20 +1,16 @@
-const bcrypt = require("bcrypt");
-const User = require("../models/user.model.js");
-const Acte = require("../models/acte.model.js");
+const User = require("../models/user.mysql.model.js");
+const UserActe = require("../models/userActe.mysql.model.js");
+const Acte = require("../models/acte.mysql.model.js");
 const WorkSheet = require("../models/worksheet.model.js");
 const Counter = require("../models/counter.model.js");
 require("dotenv").config();
-const mongoose = require("mongoose");
-const { json } = require("express");
 
 exports.createWorksheet = async (req, res) => {
   try {
     if (req.user.role !== "dentiste") {
-      return res.status(403).json({
-        message:
-          "Vous n'avez pas les droits necessaires pour créer une fiche de travail",
-      });
+      return res.status(403).json({ message: "Vous n'avez pas les droits necessaires pour créer une fiche de travail" });
     }
+
     const {
       comment,
       actes: actesSelectiones = [],
@@ -24,32 +20,17 @@ exports.createWorksheet = async (req, res) => {
       patientNumSecu,
     } = req.body;
 
-    if (
-      !patientEmail ||
-      !patientFirstName ||
-      !patientLastName ||
-      !patientNumSecu
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Merci de remplir tous les champs" });
+    if (!patientEmail || !patientFirstName || !patientLastName || !patientNumSecu) {
+      return res.status(400).json({ message: "Merci de remplir tous les champs" });
     }
 
     const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/;
-
     if (!patientEmail.match(regex)) {
-      return res
-        .status(400)
-        .json({ message: "Le format de l'email est invalide" });
+      return res.status(400).json({ message: "Le format de l'email est invalide" });
     }
 
-    const dentiste = await User.findById(req.user.id).populate({
-      path: "associatedUser", // populate le prothésiste
-      populate: {
-        // puis populate les actes dans sa liste
-        path: "actesList.acte",
-        model: "Acte",
-      },
+    const dentiste = await User.findByPk(req.user.id, {
+      include: [{ model: User, as: "associatedUser" }],
     });
 
     if (!dentiste) {
@@ -57,13 +38,14 @@ exports.createWorksheet = async (req, res) => {
     }
 
     const prothesiste = dentiste.associatedUser;
-    const actesList = prothesiste.actesList || [];
-
     if (!prothesiste) {
-      return res
-        .status(400)
-        .json({ message: "Le dentiste n'a pas de prothésiste associé" });
+      return res.status(400).json({ message: "Le dentiste n'a pas de prothésiste associé" });
     }
+
+    const actesList = await UserActe.findAll({
+      where: { userId: prothesiste.id },
+      include: [Acte],
+    });
 
     const counter = await Counter.findOneAndUpdate(
       { name: "worksheet" },
@@ -71,38 +53,29 @@ exports.createWorksheet = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const numWorkSheet = counter.seq;
-
     const actesValides = actesSelectiones.map((item) => {
-      if (!item.acteName) {
-        throw new Error("Un acte sélectionné est invalide ou manquant");
-      }
+      if (!item.acteName) throw new Error("Un acte sélectionné est invalide ou manquant");
+
       const actePro = actesList.find(
         (a) =>
-          a.acte &&
-          a.acte.acteName.trim().toLowerCase() ===
-            item.acteName.trim().toLowerCase()
+          a.Acte &&
+          a.Acte.acteName.trim().toLowerCase() === item.acteName.trim().toLowerCase()
       );
 
-      if (!actePro)
-        throw new Error(
-          `Acte non disponible dans le catalogue du prothésiste: ${item.acteName}`
-        );
+      if (!actePro) throw new Error(`Acte non disponible dans le catalogue du prothésiste: ${item.acteName}`);
+
       return {
-        acteId: actePro.acte._id,
-        acteName: actePro.acte.acteName,
+        acteId: actePro.Acte.id,
+        acteName: actePro.Acte.acteName,
         price: actePro.price,
         quantity: item.quantity || 1,
       };
     });
 
-    const total = actesValides.reduce(
-      (acc, curr) => acc + curr.price * curr.quantity,
-      0
-    );
+    const total = actesValides.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
 
     const worksheet = await WorkSheet.create({
-      numWorkSheet,
+      numWorkSheet: counter.seq,
       comment: comment || "",
       patientFirstName,
       patientLastName,
@@ -110,14 +83,14 @@ exports.createWorksheet = async (req, res) => {
       patientNumSecu,
       actes: actesValides,
       total,
-      dentisteId: dentiste._id,
-      prothesisteId: prothesiste._id,
+      dentisteId: dentiste.id,
+      prothesisteId: prothesiste.id,
     });
 
     res.status(201).json(worksheet);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: error.message || "Erreur serveur" });
   }
 };
 
@@ -125,21 +98,43 @@ exports.getWorksheetByUser = async (req, res) => {
   try {
     const user = req.user;
 
-    if (user.role == "dentiste") {
-      const worksheets = await WorkSheet.find({ dentisteId: user.id })
-        .populate("prothesisteId", "firstName lastName")
-        .sort({ createdAt: -1 });
+    if (user.role === "dentiste") {
+      const worksheets = await WorkSheet.find({ dentisteId: user.id }).sort({ createdAt: -1 });
 
-      res.status(200).json(worksheets);
-    } else if (user.role == "prothesiste") {
-      const worksheets = await WorkSheet.find({ prothesisteId: user.id })
-        .populate("dentisteId", "firstName lastName")
-        .sort({ createdAt: -1 });
+      const prothesisteIds = [...new Set(worksheets.map((w) => w.prothesisteId))];
+      const prothesistes = await User.findAll({
+        where: { id: prothesisteIds },
+        attributes: ["id", "firstName", "lastName"],
+      });
+      const prothesisteMap = Object.fromEntries(prothesistes.map((p) => [p.id, p]));
 
-      res.status(200).json(worksheets);
-    } else {
-      return res.status(403).json({ message: "Accès refusé" });
+      const enriched = worksheets.map((w) => ({
+        ...w.toObject(),
+        prothesisteId: prothesisteMap[w.prothesisteId] || { id: w.prothesisteId },
+      }));
+
+      return res.status(200).json(enriched);
     }
+
+    if (user.role === "prothesiste") {
+      const worksheets = await WorkSheet.find({ prothesisteId: user.id }).sort({ createdAt: -1 });
+
+      const dentisteIds = [...new Set(worksheets.map((w) => w.dentisteId))];
+      const dentistes = await User.findAll({
+        where: { id: dentisteIds },
+        attributes: ["id", "firstName", "lastName"],
+      });
+      const dentisteMap = Object.fromEntries(dentistes.map((d) => [d.id, d]));
+
+      const enriched = worksheets.map((w) => ({
+        ...w.toObject(),
+        dentisteId: dentisteMap[w.dentisteId] || { id: w.dentisteId },
+      }));
+
+      return res.status(200).json(enriched);
+    }
+
+    return res.status(403).json({ message: "Accès refusé" });
   } catch (error) {
     res.status(500).json({ message: "Erreur serveur", error });
   }
@@ -149,39 +144,25 @@ exports.getWorksheetById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Vérification ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "ID de fiche invalide" });
-    }
-
-    const worksheet = await WorkSheet.findById(id)
-      .populate("prothesisteId", "firstName lastName email")
-      .populate("dentisteId", "firstName lastName email");
-
+    const worksheet = await WorkSheet.findById(id);
     if (!worksheet) {
       return res.status(404).json({ message: "Fiche introuvable" });
     }
 
-    /**
-     * Sécurité :
-     * - un dentiste ne peut voir que SES fiches
-     * - un prothésiste ne peut voir que les fiches qui lui sont attribuées
-     */
-    if (
-      req.user.role === "dentiste" &&
-      worksheet.dentisteId._id.toString() !== req.user.id
-    ) {
+    const [dentiste, prothesiste] = await Promise.all([
+      User.findByPk(worksheet.dentisteId, { attributes: ["id", "firstName", "lastName", "email"] }),
+      User.findByPk(worksheet.prothesisteId, { attributes: ["id", "firstName", "lastName", "email"] }),
+    ]);
+
+    if (req.user.role === "dentiste" && worksheet.dentisteId !== req.user.id) {
       return res.status(403).json({ message: "Accès refusé" });
     }
 
-    if (
-      req.user.role === "prothesiste" &&
-      worksheet.prothesisteId._id.toString() !== req.user.id
-    ) {
+    if (req.user.role === "prothesiste" && worksheet.prothesisteId !== req.user.id) {
       return res.status(403).json({ message: "Accès refusé" });
     }
 
-    res.status(200).json(worksheet);
+    res.status(200).json({ ...worksheet.toObject(), dentisteId: dentiste, prothesisteId: prothesiste });
   } catch (error) {
     console.error("Erreur getWorksheetById :", error);
     res.status(500).json({ message: "Erreur serveur" });
@@ -191,14 +172,9 @@ exports.getWorksheetById = async (req, res) => {
 exports.deleteWorksheet = async (req, res) => {
   try {
     const worksheet = await WorkSheet.findById(req.params.id);
-    if (!worksheet)
-      return res.status(404).json({ message: "Fiche introuvable" });
+    if (!worksheet) return res.status(404).json({ message: "Fiche introuvable" });
 
-    // Vérifier que le dentiste connecté est le propriétaire
-    if (
-      req.user.role !== "dentiste" ||
-      req.user.id !== worksheet.dentisteId.toString()
-    ) {
+    if (req.user.role !== "dentiste" || worksheet.dentisteId !== req.user.id) {
       return res.status(403).json({ message: "Action non autorisée" });
     }
 
@@ -213,27 +189,13 @@ exports.deleteWorksheet = async (req, res) => {
 exports.updateWorksheet = async (req, res) => {
   try {
     const worksheet = await WorkSheet.findById(req.params.id);
-    if (!worksheet)
-      return res.status(404).json({ message: "Fiche introuvable" });
+    if (!worksheet) return res.status(404).json({ message: "Fiche introuvable" });
 
-    // Vérifier que c’est bien le dentiste qui modifie
-    if (
-      req.user.role !== "dentiste" ||
-      req.user.id !== worksheet.dentisteId.toString()
-    ) {
+    if (req.user.role !== "dentiste" || worksheet.dentisteId !== req.user.id) {
       return res.status(403).json({ message: "Action non autorisée" });
     }
 
-    // Mettre à jour les champs
-    const {
-      patientFirstName,
-      patientLastName,
-      patientEmail,
-      patientNumSecu,
-      actes,
-      comment,
-      total,
-    } = req.body;
+    const { patientFirstName, patientLastName, patientEmail, patientNumSecu, actes, comment, total } = req.body;
     worksheet.patientFirstName = patientFirstName;
     worksheet.patientLastName = patientLastName;
     worksheet.patientEmail = patientEmail;
@@ -243,7 +205,6 @@ exports.updateWorksheet = async (req, res) => {
     worksheet.total = total;
 
     await worksheet.save();
-
     res.json(worksheet);
   } catch (err) {
     console.error(err);
@@ -258,15 +219,14 @@ exports.updateStatus = async (req, res) => {
     const { status } = req.body;
     const { id } = req.params;
 
-    if(status !== "En attente" && status !== "En cours" && status !== "Termine") {
-      return res.status(400).json({ message: "status invalide"})
+    if (status !== "En attente" && status !== "En cours" && status !== "Termine") {
+      return res.status(400).json({ message: "status invalide" });
     }
 
-    // Vérifie que c'est bien le prothésiste assigné
     const ws = await WorkSheet.findById(id);
     if (!ws) return res.status(404).json({ message: "Fiche introuvable" });
 
-    if (req.user.role !== "prothesiste" || ws.prothesisteId.toString() !== req.user.id) {
+    if (req.user.role !== "prothesiste" || ws.prothesisteId !== req.user.id) {
       return res.status(403).json({ message: "Accès refusé" });
     }
 

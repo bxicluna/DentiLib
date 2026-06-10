@@ -1,150 +1,145 @@
 const request = require("supertest");
+const serverURL = "http://localhost:3000";
+const VALID_PASSWORD = "TestPassword@1";
+
 let tokenAdmin;
 
-const serverURL = "http://localhost:3000";
-
-describe("POST - Create Admin", () => {
-  // Test: création d'un admin valide
-  it("Ce teste doit créer un nouvel admin", async () => {
+describe("POST /api/user/registerAdmin", () => {
+  it("crée un admin valide", async () => {
     const res = await request(serverURL).post("/api/user/registerAdmin").send({
-      email: "admin_test@gmail.com",
-      firstName: "admin1",
-      lastName: "adminNom",
-      password: "Admin123",
+      email: "auth_admin@testdentilib.com",
+      firstName: "Admin",
+      lastName: "Test",
+      password: VALID_PASSWORD,
     });
-
     expect(res.statusCode).toBe(201);
-    expect(res.body.admin.email).toBe("admin_test@gmail.com");
+    expect(res.body.admin.email).toBe("auth_admin@testdentilib.com");
   });
 
-  // Test : création d'un admin avec un mail qui existe déjà
-  it("Ce test doit retourner un message d'erreur en cas de création d'un admin avec un mail qui existe dejà", async () => {
+  it("refuse un email déjà utilisé", async () => {
     const res = await request(serverURL).post("/api/user/registerAdmin").send({
-      email: "admin_test@gmail.com",
-      firstName: "admin1",
-      lastName: "adminNom",
-      password: "Admin123",
+      email: "auth_admin@testdentilib.com",
+      firstName: "Admin",
+      lastName: "Test",
+      password: VALID_PASSWORD,
     });
-
     expect(res.statusCode).toBe(409);
     expect(res.body.message).toBe("Email déjà utilisé");
   });
 
-  // Test : création d'un admin avec un mail invalide
-  it("Ce test doit doit retourner un message d'erreur en cas de création d'un admin avec un mail invalide", async () => {
+  it("refuse un email invalide", async () => {
     const res = await request(serverURL).post("/api/user/registerAdmin").send({
-      email: "admin_test",
-      firstName: "admin1",
-      lastName: "adminNom",
-      password: "Admin123",
+      email: "email_invalide",
+      firstName: "Admin",
+      lastName: "Test",
+      password: VALID_PASSWORD,
     });
-
     expect(res.statusCode).toBe(400);
     expect(res.body.message).toBe("Le format de l'email est invalide");
   });
 
-  // Test : création d'un admin avec un mot de passe < à 6 caractères
-  it("Ce test doit retourner un message d'erreur en cas de mot de passe < 6 caractères", async () => {
+  it("refuse un mot de passe trop faible", async () => {
     const res = await request(serverURL).post("/api/user/registerAdmin").send({
-      email: "admin_test1@gmail.com",
-      firstName: "admin1",
-      lastName: "adminNom",
+      email: "auth_admin2@testdentilib.com",
+      firstName: "Admin",
+      lastName: "Test",
       password: "123",
     });
-
     expect(res.statusCode).toBe(400);
     expect(res.body.message).toBe(
-      "Le mot de passe doit contenir au moins 6 caractères"
+      "Le mot de passe doit contenir au moins 12 caractères, une majuscule, un chiffre et un caractère spécial."
     );
+  });
+
+  it("refuse un prénom manquant", async () => {
+    const res = await request(serverURL).post("/api/user/registerAdmin").send({
+      email: "auth_admin2@testdentilib.com",
+      lastName: "Test",
+      password: VALID_PASSWORD,
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.message).toBe("Le prénom est requis");
+  });
+
+  it("refuse un nom manquant", async () => {
+    const res = await request(serverURL).post("/api/user/registerAdmin").send({
+      email: "auth_admin2@testdentilib.com",
+      firstName: "Admin",
+      password: VALID_PASSWORD,
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.message).toBe("Le nom est requis");
   });
 });
 
-describe("POST - Login", () => {
-  // Test: Login admin valide
-  it("Ce test dois retourner un message de succès avec les infos requisent", async () => {
+describe("POST /api/user/login", () => {
+  it("connecte un admin valide et retourne un token", async () => {
     const res = await request(serverURL).post("/api/user/login").send({
-      email: "admin_test@gmail.com",
-      password: "Admin123",
+      email: "auth_admin@testdentilib.com",
+      password: VALID_PASSWORD,
     });
-
     expect(res.statusCode).toBe(200);
     expect(res.body.token).toBeDefined();
     expect(res.body.role).toBe("admin");
-
     tokenAdmin = res.body.token;
   });
 
-  // Test: Login admin avec mot de passe invalide
-  it("Ce test dois retourner un message d'erreur en cas de connexion avec un mauvais mot de passe", async () => {
+  it("refuse un mot de passe incorrect", async () => {
     const res = await request(serverURL).post("/api/user/login").send({
-      email: "admin_test@gmail.com",
-      password: "Admin",
+      email: "auth_admin@testdentilib.com",
+      password: "MauvaisMotDePasse@1",
     });
-
     expect(res.statusCode).toBe(401);
     expect(res.body.message).toBe("Mot de passe incorrect");
   });
 
-  // Test: Login admin avec email inexistant
-  it("Ce test dois retourner un message d'erreur en cas de connexion avec un email inexistant", async () => {
+  it("refuse un email inexistant", async () => {
     const res = await request(serverURL).post("/api/user/login").send({
-      email: "admin_test5@gmail.com",
-      password: "Admin123",
+      email: "inexistant@testdentilib.com",
+      password: VALID_PASSWORD,
     });
-
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe("L'utilisateur n'existe pas");
   });
 
-  // Test: Login admin sans email
-  it("Ce test dois retourner un message d'erreur en cas de connexion sans email", async () => {
+  it("refuse un email vide", async () => {
     const res = await request(serverURL).post("/api/user/login").send({
       email: "",
-      password: "Admin123",
+      password: VALID_PASSWORD,
     });
-
     expect(res.statusCode).toBe(400);
-    expect(res.body.message).toBe("Merci de remplir tous les champs");
+    expect(res.body.message).toBe("Le format de l'email est invalide");
   });
 
-  // Test: Login admin sans mot de passe
-  it("Ce test dois retourner un message d'erreur en cas de connexion sans mot de passe", async () => {
+  it("refuse un mot de passe vide", async () => {
     const res = await request(serverURL).post("/api/user/login").send({
-      email: "admin_test@gmail.com",
+      email: "auth_admin@testdentilib.com",
       password: "",
     });
-
     expect(res.statusCode).toBe(400);
-    expect(res.body.message).toBe("Merci de remplir tous les champs");
+    expect(res.body.message).toBe("Le mot de passe est requis");
   });
 });
 
-describe("DELETE - Delete My account", () => {
-  // Test: supprime le compte connecté
-  it("Ce test dois retourner un message de succès lors de la suppression du compte connecté", async () => {
+describe("DELETE /api/user/deleteMyAccount", () => {
+  it("supprime le compte connecté", async () => {
     const res = await request(serverURL)
       .delete("/api/user/deleteMyAccount")
       .set("Authorization", `Bearer ${tokenAdmin}`);
-
     expect(res.statusCode).toBe(200);
     expect(res.body.message).toBe("Utilisateur supprimé avec succès");
   });
 
-  // Test: supprime le compte connecté sans saisir de token
-  it("Ce test dois retourner un message d'erreur lors de la suppression du compte connecté sans saisir de token", async () => {
-    const res = await request(serverURL)
-      .delete("/api/user/deleteMyAccount")
-
+  it("refuse sans token", async () => {
+    const res = await request(serverURL).delete("/api/user/deleteMyAccount");
     expect(res.statusCode).toBe(403);
     expect(res.body.message).toBe("Token manquant ou invalide");
   });
 
-  // Test: supprimer un compte déjà supprimé
-  it("Ce test dois retourner un message d'erreur lors de la suppression d'un compte déjà supprimé", async () => {
+  it("refuse si le compte est déjà supprimé", async () => {
     const res = await request(serverURL)
       .delete("/api/user/deleteMyAccount")
       .set("Authorization", `Bearer ${tokenAdmin}`);
-
     expect(res.statusCode).toBe(404);
     expect(res.body.message).toBe("Admin inexistant");
   });
