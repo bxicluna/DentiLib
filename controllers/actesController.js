@@ -93,7 +93,7 @@ exports.getMyActes = async (req, res) => {
 
     const actesList = await UserActe.findAll({
       where: { userId: req.user.id },
-      include: [Acte],
+      include: [{ model: Acte, as: "acte" }],
     });
 
     res.json(actesList);
@@ -114,7 +114,7 @@ exports.getProthesisteActes = async (req, res) => {
 
     const actesList = await UserActe.findAll({
       where: { userId: prothesisteId },
-      include: [Acte],
+      include: [{ model: Acte, as: "acte" }],
     });
 
     res.json({

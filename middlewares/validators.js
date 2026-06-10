@@ -49,10 +49,10 @@ const createAccountValidator = [
   passwordComplex,
   body('role')
     .isIn(['admin', 'dentiste', 'prothesiste']).withMessage("Ce rôle n'existe pas"),
-  body('siret').optional()
+  body('siret').optional({ nullable: true, checkFalsy: true })
     .isLength({ min: 14, max: 14 }).withMessage('Le SIRET doit contenir exactement 14 caractères')
     .isNumeric().withMessage('Le SIRET doit être composé uniquement de chiffres'),
-  body('dentisteId').optional()
+  body('dentisteId').optional({ nullable: true })
     .isInt({ min: 1 }).withMessage('dentisteId invalide'),
   handleValidation,
 ]

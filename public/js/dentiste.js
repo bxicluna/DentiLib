@@ -229,7 +229,7 @@ function addActeRow(actesCatalogue = []) {
       ${actesCatalogue
         .map(
           (a) =>
-            `<option value="${a._id}" data-price="${a.price}">${a.acte.acteName}</option>`
+            `<option value="${a.id}" data-price="${a.price}">${a.acte.acteName}</option>`
         )
         .join("")}
     </select>
@@ -333,7 +333,7 @@ createWorksheetForm.addEventListener("submit", async (e) => {
       patientLastName: patientLastNameInput.value,
       patientEmail: patientEmailInput.value,
       patientNumSecu: patientNumSecuInput.value,
-      prothesisteId: prothesiste._id,
+      prothesisteId: prothesiste.id,
       actes,
       comment: commentInput.value,
       total: parseFloat(totalAmount.textContent),
