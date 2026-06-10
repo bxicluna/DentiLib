@@ -32,16 +32,20 @@ body {
 
 .message-modal {
   display: none;
-  text-align: center;
   margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 500;
-  color: red;
+  text-align: center;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 .message-modal.success {
+  background-color: #dcfce7;
   color: #166534;
+  border-color: #86efac;
 }
 
 /* ===== HEADER ===== */

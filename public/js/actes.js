@@ -17,9 +17,8 @@ let currentEditingActeId = null;
 if (!token || role !== "admin" || isTokenExpired(token)) {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
-
-  alert("Session expirée, veuillez vous reconnecter");
-  window.location.href = "/login.html";
+  showActeGlobalMessage("Session expirée, veuillez vous reconnecter");
+  setTimeout(() => { window.location.href = "/login.html"; }, 1500);
 }
 
 // Messages dans la modale
@@ -82,7 +81,7 @@ cancelBtn.addEventListener("click", () => {
 
 // Fonction pour ouvrir la modale avec les infos de l'acte
 function openEditActeModal(acte) {
-  currentEditingActeId = acte._id; // Mode Edition
+  currentEditingActeId = acte.id; // Mode Edition
   acteNameForm.value = acte.acteName;
   acteDescrForm.value = acte.acteDescription;
   modalTitle.textContent = "Modifier l’acte";
@@ -182,7 +181,7 @@ async function chargerActes() {
         <td class="actions">
           <div>
             <button class="btn-edit" data-acte='${JSON.stringify(acte)}'>✏️</button>
-            <button class="btn-delete" data-id="${acte._id}">❌</button>
+            <button class="btn-delete" data-id="${acte.id}">❌</button>
           </div>
         </td>`;
 

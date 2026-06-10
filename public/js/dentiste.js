@@ -70,14 +70,8 @@ function isTokenExpired(token) {
 function showModalMessage(text, type = "error") {
   messageModal.textContent = text;
   messageModal.style.display = "block";
-
-  if (type === "error") {
-    messageModal.classList.remove("success");
-    messageModal.style.color = "red";
-  } else {
-    messageModal.classList.add("success");
-    messageModal.style.color = "green";
-  }
+  messageModal.classList.remove("success");
+  if (type === "success") messageModal.classList.add("success");
 }
 
 function hideModalMessage() {
@@ -87,17 +81,9 @@ function hideModalMessage() {
 function showMessage(text, type = "error") {
   messageSystem.textContent = text;
   messageSystem.style.display = "block";
-
-  if (type === "error") {
-    messageSystem.classList.remove("success");
-    messageSystem.style.color = "red";
-  } else {
-    messageSystem.classList.add("success");
-    messageSystem.style.color = "green";
-  }
-  setTimeout(() => {
-    messageSystem.style.display = "none";
-  }, 3000);
+  messageSystem.classList.remove("success");
+  if (type === "success") messageSystem.classList.add("success");
+  setTimeout(() => { messageSystem.style.display = "none"; }, 4000);
 }
 
 patientFilterInput.addEventListener("input", filterWorksheets);
@@ -111,11 +97,26 @@ async function loadDentistesWorksheet() {
     const res = await fetch("/api/worksheet/getWorksheetByUser", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    allWorksheets = await res.json(); // stocke toutes les fiches
 
-    displayWorksheets(allWorksheets); // affichage initial
+    if (res.status === 401) {
+      localStorage.clear();
+      showMessage("Session expirée, veuillez vous reconnecter");
+      setTimeout(() => { window.location.href = "/login.html"; }, 1500);
+      return;
+    }
+
+    if (!res.ok) {
+      let errorMsg = "Impossible de charger les fiches de travaux";
+      try { const data = await res.json(); errorMsg = data.message || errorMsg; } catch {}
+      showMessage(errorMsg);
+      return;
+    }
+
+    allWorksheets = await res.json();
+    displayWorksheets(allWorksheets);
   } catch (error) {
     console.error("Erreur lors du chargement des fiches travaux", error);
+    showMessage("Erreur serveur, veuillez réessayer plus tard");
   }
 }
 
@@ -147,7 +148,7 @@ function displayWorksheets(worksheets) {
       <td>${ws.total}</td>
       <td>
         <button class="btn btn-detail btn-detail-worksheet" data-id="${
-          ws._id
+          ws.id
         }">Détail</button>
       </td>
     `;

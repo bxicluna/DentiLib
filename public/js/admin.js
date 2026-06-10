@@ -29,18 +29,25 @@ const editSiretContainer = document.getElementById("editSiretContainer");
 const rechercheText = document.getElementById("recherche-text");
 const selectFilter = document.getElementById("type-filter");
 const searchInput = document.getElementById("recherche-text");
-const clearSearchBtn = document.getElementById("clear-search");
 const adminNameDiv = document.getElementById("adminName");
+const messageSystem = document.getElementById("messageSystem");
 
 let currentEditingUserId = null;
 let selectedDentisteId = null;
 
+function showMessage(text, type = "error") {
+  messageSystem.textContent = text;
+  messageSystem.style.display = "block";
+  messageSystem.classList.remove("success");
+  if (type === "success") messageSystem.classList.add("success");
+  setTimeout(() => { messageSystem.style.display = "none"; }, 4000);
+}
+
 if (!token || role !== "admin" || isTokenExpired(token)) {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
-
-  alert("Session expirée, veuillez vous reconnecter");
-  window.location.href = "/login.html";
+  showMessage("Session expirée, veuillez vous reconnecter");
+  setTimeout(() => { window.location.href = "/login.html"; }, 1500);
 } else {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
@@ -85,7 +92,7 @@ cancelBtn.addEventListener("click", () => {
 
 // Fonction pour ouvrir la modale avec les infos de l'utilisateur
 function openEditUserModal(user) {
-  currentEditingUserId = user._id;
+  currentEditingUserId = user.id;
   editFirstName.value = user.firstName;
   editLastName.value = user.lastName;
   editEmail.value = user.email;
@@ -113,7 +120,7 @@ editUserForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   try {
-    await fetch(`/api/admin/updateUser/${currentEditingUserId}`, {
+    const res = await fetch(`/api/admin/updateUser/${currentEditingUserId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -127,10 +134,19 @@ editUserForm.addEventListener("submit", async (e) => {
       }),
     });
 
+    if (!res.ok) {
+      let errorMsg = "Impossible de modifier l'utilisateur";
+      try { const data = await res.json(); errorMsg = data.message || errorMsg; } catch {}
+      showMessage(errorMsg);
+      return;
+    }
+
     editUserModal.classList.remove("active");
-    chargerUser(); // rafraîchir le tableau
+    showMessage("Utilisateur modifié avec succès !", "success");
+    chargerUser();
   } catch (error) {
     console.error("Erreur lors de la modification de l'utilisateur", error);
+    showMessage("Erreur serveur, veuillez réessayer plus tard");
   }
 });
 
@@ -194,7 +210,7 @@ async function chargerUser() {
       <td class="actions">
         <div>
           <button class="btn-edit" data-user='${JSON.stringify(user)}'>✏️</button>
-          <button class="btn-delete" data-id="${user._id}">❌</button>
+          <button class="btn-delete" data-id="${user.id}">❌</button>
         </div>
       </td>
   `;
@@ -207,7 +223,6 @@ async function chargerUser() {
       btn.addEventListener("click", async (e) => {
         const user = JSON.parse(e.currentTarget.dataset.user);
         openEditUserModal(user);
-        console.log("Modifier utilisateur", userId);
       });
     });
 
@@ -217,22 +232,31 @@ async function chargerUser() {
         const userId = e.currentTarget.dataset.id;
         if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
           try {
-            await fetch(`/api/user/deleteUser/${userId}`, {
+            const res = await fetch(`/api/user/deleteUser/${userId}`, {
               method: "DELETE",
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
             });
+            if (!res.ok) {
+              let errorMsg = "Impossible de supprimer cet utilisateur";
+              try { const data = await res.json(); errorMsg = data.message || errorMsg; } catch {}
+              showMessage(errorMsg);
+              return;
+            }
+            showMessage("Utilisateur supprimé avec succès !", "success");
             chargerUser();
           } catch (error) {
             console.error("Erreur suppression utilisateur", error);
+            showMessage("Erreur serveur, veuillez réessayer plus tard");
           }
         }
       });
     });
   } catch (error) {
     console.error("Erreur lors du chargement des utilisateurs", error);
+    showMessage("Impossible de charger la liste des utilisateurs");
   }
 }
 
@@ -257,33 +281,29 @@ async function chargerDentistes() {
           <td>${dentiste.firstName} ${dentiste.lastName}</td>
           <td>${dentiste.email} </td>`;
 
-      tr.dataset = dentiste._id;
+      tr.dataset.id = dentiste.id;
 
       // gestion du clic pour la selection
       tr.addEventListener("click", () => {
-        // Supprimer la selection precedente
         document
           .querySelectorAll("#dentisteTableBody tr")
           .forEach((r) => r.classList.remove("selected"));
 
-        // Ajouter la sélection sur cette ligne
         tr.classList.add("selected");
-
-        // Stocker l'id du dentiste
-        selectedDentisteId = dentiste._id;
-        console.log(selectedDentisteId);
+        selectedDentisteId = dentiste.id;
       });
       dentisteTableBody.appendChild(tr);
     }
   } catch (error) {
     console.error("Erreur lors du chargement des dentistes", error);
+    showMessage("Impossible de charger la liste des dentistes");
   }
 }
 
 async function addUser(e) {
-  try {
-    e.preventDefault();
+  e.preventDefault();
 
+  try {
     const res = await fetch("/api/admin/createAccount", {
       method: "POST",
       headers: {
@@ -301,16 +321,25 @@ async function addUser(e) {
       }),
     });
 
+    if (!res.ok) {
+      let errorMsg = "Impossible de créer l'utilisateur";
+      try { const data = await res.json(); errorMsg = data.message || errorMsg; } catch {}
+      showMessage(errorMsg);
+      return;
+    }
+
     modal.classList.remove("active");
     userForm.reset();
     siretContainer.classList.add("hidden");
-    dentisteTableBody.innerHTML = ""; // vide le tableau des dentistes
-    dentisteContainer.classList.add("hidden"); // cache le tableau
-    selectedDentisteId = null; // réinitialise la sélection
+    dentisteTableBody.innerHTML = "";
+    dentisteContainer.classList.add("hidden");
+    selectedDentisteId = null;
     roleForm.value = "Sélectionner un rôle";
+    showMessage("Utilisateur créé avec succès !", "success");
     chargerUser();
   } catch (error) {
-    console.error("Erreur lors de l'ajout de l'utilisateurs", error);
+    console.error("Erreur lors de l'ajout de l'utilisateur", error);
+    showMessage("Erreur serveur, veuillez réessayer plus tard");
   }
 }
 

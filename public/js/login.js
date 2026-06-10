@@ -10,22 +10,19 @@ form.addEventListener('submit', async (event) => {
     const password = passwordInput.value.trim()
 
     if(!email || !password) {
-        message.textContent = "Tous les champs sont requis"
-        message.style.color = 'red'
+        showMessage("Tous les champs sont requis")
         return
     }
 
     const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
 
     if(!email.match(regex)){
-        message.textContent = "Le format de l'email est invalide"
-        message.style.color = 'red'
+        showMessage("Le format de l'email est invalide")
         return
     }
 
     if(password.length < 6){
-        message.textContent = "Le mot de passe doit contenir au moins 6 caractères"
-        message.style.color = 'red'
+        showMessage("Le mot de passe doit contenir au moins 6 caractères")
         return
     }
 
@@ -43,8 +40,7 @@ form.addEventListener('submit', async (event) => {
         console.log(responseData)
 
         if(!response.ok) {
-            message.textContent = responseData.message
-            message.style.color = 'red'
+            showMessage(responseData.message || "Identifiants incorrects")
         } else {
 
             console.log(responseData.role);
@@ -75,9 +71,15 @@ form.addEventListener('submit', async (event) => {
 
 
     } catch(error) {
-        message.textContent = error.message
-        message.style.color = 'red'
+        showMessage("Erreur serveur, veuillez réessayer plus tard")
     }
 })
+
+function showMessage(text, type = "error") {
+    message.textContent = text
+    message.style.display = "block"
+    message.classList.remove("success")
+    if (type === "success") message.classList.add("success")
+}
 
 

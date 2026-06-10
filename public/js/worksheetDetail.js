@@ -30,9 +30,8 @@ if (
 ) {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
-
-  alert("Session expirée, veuillez vous reconnecter");
-  window.location.href = "/login.html";
+  showMessage("Session expirée, veuillez vous reconnecter");
+  setTimeout(() => { window.location.href = "/login.html"; }, 1500);
 }
 
 function isTokenExpired(token) {
@@ -78,7 +77,7 @@ async function loadWorksheet() {
     // 2️⃣ Déterminer le catalogue d'actes
     if (role === "dentiste") {
       if (!user.associatedUser) {
-        alert("Aucun prothésiste associé !");
+        showMessage("Aucun prothésiste associé à votre compte");
         return;
       }
 
@@ -101,7 +100,12 @@ async function loadWorksheet() {
       }
     );
 
-    if (!resWorksheet.ok) throw new Error("Erreur chargement fiche");
+    if (!resWorksheet.ok) {
+      let errorMsg = "Impossible de charger la fiche";
+      try { const data = await resWorksheet.json(); errorMsg = data.message || errorMsg; } catch {}
+      showMessage(errorMsg);
+      return;
+    }
 
     worksheet = await resWorksheet.json();
 
@@ -135,7 +139,7 @@ async function loadWorksheet() {
     calculerTotal();
   } catch (err) {
     console.error(err);
-    alert("Impossible de charger la fiche");
+    showMessage("Erreur serveur, impossible de charger la fiche");
   }
 }
 
@@ -346,7 +350,7 @@ if (role === "prothesiste") {
       updateStatusBadge(newStatus);
     } catch (err) {
       console.error(err);
-      alert("Impossible de changer le statut");
+      showMessage("Impossible de changer le statut");
     }
   });
 }

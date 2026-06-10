@@ -61,16 +61,12 @@ function isTokenExpired(token) {
   }
 }
 
-// Fonction pour afficher les erreur au bon format
 function showMessage(text, type = "error") {
   messageSystem.textContent = text;
   messageSystem.style.display = "block";
-
-  if (type === "error") {
-    messageSystem.style.color = "red";
-  } else {
-    messageSystem.style.color = "green";
-  }
+  messageSystem.classList.remove("success");
+  if (type === "success") messageSystem.classList.add("success");
+  setTimeout(() => { messageSystem.style.display = "none"; }, 4000);
 }
 
 // Bouton Gérer mon catalogue
@@ -171,7 +167,7 @@ async function displayWorksheets(worksheets) {
       <td>${ws.total}</td>
       <td>
         <button class="btn btn-detail btn-detail-worksheet" data-id="${
-          ws._id
+          ws.id
         }">Détail</button>
       </td>
     `;

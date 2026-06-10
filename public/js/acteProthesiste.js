@@ -31,19 +31,9 @@ function isTokenExpired(token) {
 function showMessage(text, type = "error") {
   messageSystem.textContent = text;
   messageSystem.style.display = "block";
-
-  if (type === "error") {
-    messageSystem.classList.remove("success");
-    messageSystem.style.color = "red";
-  } else {
-    messageSystem.classList.add("success");
-    messageSystem.style.color = "green";
-  }
-
-  // Optionnel : disparaît après 3 secondes
-  setTimeout(() => {
-    messageSystem.style.display = "none";
-  }, 3000);
+  messageSystem.classList.remove("success");
+  if (type === "success") messageSystem.classList.add("success");
+  setTimeout(() => { messageSystem.style.display = "none"; }, 4000);
 }
 
 
