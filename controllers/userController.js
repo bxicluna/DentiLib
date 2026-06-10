@@ -109,9 +109,9 @@ exports.getUserById = async (req, res) => {
         {
           model: User,
           as: "associatedUser",
-          include: [{ model: UserActe, as: "actesList", include: [Acte] }],
+          include: [{ model: UserActe, as: "actesList", include: [{ model: Acte, as: "acte" }] }],
         },
-        { model: UserActe, as: "actesList", include: [Acte] },
+        { model: UserActe, as: "actesList", include: [{ model: Acte, as: "acte" }] },
       ],
     });
 

@@ -13,7 +13,7 @@ const UserActe = sequelize.define(
 
 // Associations
 UserActe.belongsTo(User, { foreignKey: "userId" });
-UserActe.belongsTo(Acte, { foreignKey: "acteId" });
+UserActe.belongsTo(Acte, { foreignKey: "acteId", as: "acte" });
 User.hasMany(UserActe, { foreignKey: "userId", as: "actesList" });
 User.belongsTo(User,   { as: "associatedUser", foreignKey: "associatedUserId" });
 

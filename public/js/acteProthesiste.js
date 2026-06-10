@@ -116,12 +116,12 @@ async function loadProthesistActes() {
           type="number"
           class="price-input"
           value="${acteItem.price}"
-          data-id="${acteItem._id}"
+          data-id="${acteItem.id}"
         />
       </td>
       <td>
-        <button class="btn-edit" data-id="${acteItem._id}">💾</button>
-        <button class="btn-delete" data-id="${acteItem._id}">❌</button>
+        <button class="btn-edit" data-id="${acteItem.id}">💾</button>
+        <button class="btn-delete" data-id="${acteItem.id}">❌</button>
       </td>
     `;
 

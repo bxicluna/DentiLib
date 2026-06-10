@@ -44,7 +44,7 @@ exports.createWorksheet = async (req, res) => {
 
     const actesList = await UserActe.findAll({
       where: { userId: prothesiste.id },
-      include: [Acte],
+      include: [{ model: Acte, as: "acte" }],
     });
 
     const actesValides = actesSelectiones.map((item) => {
@@ -52,14 +52,14 @@ exports.createWorksheet = async (req, res) => {
 
       const actePro = actesList.find(
         (a) =>
-          a.Acte &&
-          a.Acte.acteName.trim().toLowerCase() === item.acteName.trim().toLowerCase()
+          a.acte &&
+          a.acte.acteName.trim().toLowerCase() === item.acteName.trim().toLowerCase()
       );
 
       if (!actePro) throw new Error(`Acte non disponible dans le catalogue du prothésiste: ${item.acteName}`);
 
       return {
-        acteName: actePro.Acte.acteName,
+        acteName: actePro.acte.acteName,
         price: actePro.price,
         quantity: item.quantity || 1,
       };

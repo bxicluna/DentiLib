@@ -10,19 +10,7 @@ form.addEventListener('submit', async (event) => {
     const password = passwordInput.value.trim()
 
     if(!email || !password) {
-        showMessage("Tous les champs sont requis")
-        return
-    }
-
-    const regex = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/
-
-    if(!email.match(regex)){
-        showMessage("Le format de l'email est invalide")
-        return
-    }
-
-    if(password.length < 12){
-        showMessage("Le mot de passe doit contenir au moins 12 caractères")
+        showMessage("Veuillez saisir votre email et votre mot de passe")
         return
     }
 
@@ -37,13 +25,9 @@ form.addEventListener('submit', async (event) => {
 
         const responseData = await response.json()
 
-        console.log(responseData)
-
         if(!response.ok) {
             showMessage(responseData.message || "Identifiants incorrects")
         } else {
-
-            console.log(responseData.role);
             if(responseData.token){
                 localStorage.setItem('token', responseData.token)
             }
