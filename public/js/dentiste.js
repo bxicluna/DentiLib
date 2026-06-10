@@ -163,7 +163,7 @@ function filterWorksheets() {
 
   const filtered = allWorksheets.filter((ws) => {
     // Filtre patient (nom ou prénom)
-    const matchesPatient =
+    const matchesPatient = !patientFilter ||
       ws.patientFirstName.toLowerCase().includes(patientFilter) ||
       ws.patientLastName.toLowerCase().includes(patientFilter);
 
