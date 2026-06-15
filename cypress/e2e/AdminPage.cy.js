@@ -96,15 +96,15 @@ describe("Page Admin — DentiLib", () => {
     cy.get("#mainUserTableBody").should("contain", "Jean");
 
     // Nettoyage du dentiste créé
-    cy.request("GET", "/api/admin/getAllDentistes", {}).then(() => {
-      cy.request({
-        method: "GET",
-        url: "/api/admin/getUserWithoutAdmin",
-        headers: { Authorization: `Bearer ${adminToken}` },
-      }).then((res) => {
-        const dentiste = res.body.find((u) => u.email === "cy_dentiste@testdentilib.com");
-        if (dentiste) cy.deleteUser(dentiste.id, adminToken);
-      });
+    cy.request({
+      method: "GET",
+      url: "/api/admin/getUserWithoutAdmin",
+      headers: { Authorization: `Bearer ${adminToken}` },
+    }).then((res) => {
+      const dentiste = res.body.find(
+        (u) => u.email === "cy_dentiste@testdentilib.com",
+      );
+      if (dentiste) cy.deleteUser(dentiste.id, adminToken);
     });
   });
 
@@ -113,9 +113,13 @@ describe("Page Admin — DentiLib", () => {
   it("filtre les utilisateurs par rôle", () => {
     cy.get("#type-filter").select("Dentiste");
     cy.get("#mainUserTableBody tr").each(($row) => {
-      cy.wrap($row).find("td").eq(2).invoke("text").then((role) => {
-        expect(role.toLowerCase()).to.include("dentiste");
-      });
+      cy.wrap($row)
+        .find("td")
+        .eq(2)
+        .invoke("text")
+        .then((role) => {
+          expect(role.toLowerCase()).to.include("dentiste");
+        });
     });
   });
 
@@ -132,8 +136,14 @@ describe("Page Admin — DentiLib", () => {
   // --- Redirection si non authentifié ---
 
   it("redirige vers login.html si aucun token n'est présent", () => {
-    cy.on("window:alert", () => false);
+    cy.clearLocalStorage();
     cy.visit("/admin.html");
-    cy.url().should("include", "login.html");
+    // attend le message d'erreur d'abord
+    cy.get("#messageSystem", { timeout: 5000 }).should(
+      "contain",
+      "Session expirée",
+    );
+    // puis attend la redirection après le setTimeout de 1500ms
+    cy.url({ timeout: 5000 }).should("include", "login.html");
   });
 });

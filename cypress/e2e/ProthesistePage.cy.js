@@ -16,7 +16,14 @@ describe("Page Prothésiste — DentiLib", () => {
         method: "POST",
         url: "/api/admin/createAccount",
         headers: { Authorization: `Bearer ${adminToken}` },
-        body: { firstName: "Marc", lastName: "Dentiste", email: "cy_proth_dentiste@testdentilib.com", password: VALID_PASSWORD, role: "dentiste", siret: "12345678901234" },
+        body: {
+          firstName: "Marc",
+          lastName: "Dentiste",
+          email: "cy_proth_dentiste@testdentilib.com",
+          password: VALID_PASSWORD,
+          role: "dentiste",
+          siret: "12345678901234",
+        },
       }).then((res) => {
         dentisteId = res.body.user?.id;
 
@@ -25,12 +32,24 @@ describe("Page Prothésiste — DentiLib", () => {
           method: "POST",
           url: "/api/admin/createAccount",
           headers: { Authorization: `Bearer ${adminToken}` },
-          body: { firstName: "Anne", lastName: "Prothesiste", email: "cy_proth_proth@testdentilib.com", password: VALID_PASSWORD, role: "prothesiste", siret: "12345678901234", dentisteId },
+          body: {
+            firstName: "Anne",
+            lastName: "Prothesiste",
+            email: "cy_proth_proth@testdentilib.com",
+            password: VALID_PASSWORD,
+            role: "prothesiste",
+            siret: "12345678901234",
+            dentisteId,
+          },
         }).then((res2) => {
           prothesisteId = res2.body.prothesiste?.id;
 
-          cy.request("POST", "/api/user/login", { email: "cy_proth_proth@testdentilib.com", password: VALID_PASSWORD })
-            .then((r) => { prothesisteToken = r.body.token; });
+          cy.request("POST", "/api/user/login", {
+            email: "cy_proth_proth@testdentilib.com",
+            password: VALID_PASSWORD,
+          }).then((r) => {
+            prothesisteToken = r.body.token;
+          });
         });
       });
     });
@@ -84,9 +103,13 @@ describe("Page Prothésiste — DentiLib", () => {
   // --- Redirection si non authentifié ---
 
   it("redirige vers login.html si aucun token n'est présent", () => {
-    cy.on("window:alert", () => false);
+    cy.clearLocalStorage();
     cy.visit("/prothesiste.html");
-    cy.url().should("include", "login.html");
+    cy.get("#messageSystem", { timeout: 5000 }).should(
+      "contain",
+      "Session expirée",
+    );
+    cy.url({ timeout: 5000 }).should("include", "login.html");
   });
 
   // --- Mise à jour du statut d'une fiche (via API mockée) ---

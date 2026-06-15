@@ -185,7 +185,7 @@ describe("POST /api/admin/createAccount — prothésiste", () => {
         role: "prothesiste",
       });
     expect(res.statusCode).toBe(400);
-    expect(res.body.message).toBe("dentisteId est necessaire pour un prothesiste");
+    expect(res.body.message).toBe("Veuillez sélectionner un dentiste à associer au prothésiste");
   });
 
   it("refuse un prothésiste avec un dentisteId inexistant", async () => {

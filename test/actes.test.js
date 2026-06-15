@@ -91,6 +91,7 @@ describe("POST /api/acte/addActe", () => {
       .set("Authorization", `Bearer ${tokenProthesiste}`)
       .send({ acteName: "Couronne céramique", price: 350 });
 
+
     userActeId = res.body.userActe?.id;
     expect(res.statusCode).toBe(201);
     expect(res.body.message).toBe("Acte ajouté à votre catalogue");

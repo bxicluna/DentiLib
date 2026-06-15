@@ -8,31 +8,76 @@ let prothesisteId;
 
 describe("Page Dentiste — DentiLib", () => {
   before(() => {
-    // Admin
     cy.createAdminAndLogin(ADMIN_EMAIL).then(({ token }) => {
       adminToken = token;
 
-      // Dentiste
+      // Créer un acte global si nécessaire
       cy.request({
         method: "POST",
-        url: "/api/admin/createAccount",
+        url: "/api/admin/createActe",
         headers: { Authorization: `Bearer ${adminToken}` },
-        body: { firstName: "Paul", lastName: "Dentiste", email: "cy_dent_dentiste@testdentilib.com", password: VALID_PASSWORD, role: "dentiste", siret: "12345678901234" },
-      }).then((res) => {
-        dentisteId = res.body.user?.id;
-
-        // Prothésiste lié
+        body: {
+          acteName: "Couronne céramique",
+          acteDescription: "Couronne en céramique",
+        },
+        failOnStatusCode: false, // ne plante pas si l'acte existe déjà
+      }).then(() => {
+        // Dentiste
         cy.request({
           method: "POST",
           url: "/api/admin/createAccount",
           headers: { Authorization: `Bearer ${adminToken}` },
-          body: { firstName: "Claire", lastName: "Prothesiste", email: "cy_dent_proth@testdentilib.com", password: VALID_PASSWORD, role: "prothesiste", siret: "12345678901234", dentisteId },
-        }).then((res2) => {
-          prothesisteId = res2.body.prothesiste?.id;
+          body: {
+            firstName: "Paul",
+            lastName: "Dentiste",
+            email: "cy_dent_dentiste@testdentilib.com",
+            password: VALID_PASSWORD,
+            role: "dentiste",
+            siret: "12345678901234",
+          },
+        }).then((res) => {
+          dentisteId = res.body.user?.id;
 
-          // Token dentiste
-          cy.request("POST", "/api/user/login", { email: "cy_dent_dentiste@testdentilib.com", password: VALID_PASSWORD })
-            .then((r) => { dentisteToken = r.body.token; });
+          // Prothésiste lié
+          cy.request({
+            method: "POST",
+            url: "/api/admin/createAccount",
+            headers: { Authorization: `Bearer ${adminToken}` },
+            body: {
+              firstName: "Claire",
+              lastName: "Prothesiste",
+              email: "cy_dent_proth@testdentilib.com",
+              password: VALID_PASSWORD,
+              role: "prothesiste",
+              siret: "12345678901234",
+              dentisteId,
+            },
+          }).then((res2) => {
+            prothesisteId = res2.body.prothesiste?.id;
+
+            // Connexion prothésiste pour ajouter l'acte à son catalogue
+            cy.request("POST", "/api/user/login", {
+              email: "cy_dent_proth@testdentilib.com",
+              password: VALID_PASSWORD,
+            }).then((loginRes) => {
+              const prothToken = loginRes.body.token;
+
+              cy.request({
+                method: "POST",
+                url: "/api/acte/addActe",
+                headers: { Authorization: `Bearer ${prothToken}` },
+                body: { acteName: "Couronne céramique", price: 150 },
+              }).then(() => {
+                // Token dentiste
+                cy.request("POST", "/api/user/login", {
+                  email: "cy_dent_dentiste@testdentilib.com",
+                  password: VALID_PASSWORD,
+                }).then((r) => {
+                  dentisteToken = r.body.token;
+                });
+              });
+            });
+          });
         });
       });
     });
@@ -104,19 +149,29 @@ describe("Page Dentiste — DentiLib", () => {
   // --- Création d'une fiche ---
 
   it("crée une fiche et la voit apparaître dans le tableau", () => {
-    cy.intercept("POST", "/api/worksheet/createWorksheet").as("createWorksheet");
-    cy.intercept("GET", "/api/worksheet/getWorksheetByUser").as("getWorksheets");
+    cy.intercept("POST", "/api/worksheet/createWorksheet").as(
+      "createWorksheet",
+    );
+    cy.intercept("GET", "/api/worksheet/getWorksheetByUser").as(
+      "getWorksheets",
+    );
 
     cy.get("#btnOpenCreate").click();
     cy.get("#patientFirstName").type("Sophie");
     cy.get("#patientLastName").type("Dupont");
     cy.get("#patientEmail").type("sophie@mail.com");
     cy.get("#patientNumSecu").type("295067512312345");
+
+    cy.get("#actesContainer .acte-row", { timeout: 8000 }).should("exist");
+    cy.get(".acte-row .acteName").first().select(1);
+    cy.get(".acte-row .acteQuantity").first().clear().type("1");
+
     cy.get("#createWorksheetBtn").click();
 
-    cy.wait("@createWorksheet").its("response.statusCode").should("eq", 201);
+    cy.wait("@createWorksheet", { timeout: 10000 })
+      .its("response.statusCode")
+      .should("eq", 201);
     cy.wait("@getWorksheets");
-
     cy.get("#dentisteTableBody").should("contain", "Sophie");
   });
 

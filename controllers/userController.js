@@ -85,13 +85,12 @@ exports.deleteUser = async (req, res) => {
 
 exports.deleteMyAccount = async (req, res) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Accès refusé." });
-    }
-
     const user = await User.findByPk(req.user.id);
     if (!user) {
       return res.status(404).json({ message: "Admin inexistant" });
+    }
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Accès refusé." });
     }
 
     await user.destroy();
